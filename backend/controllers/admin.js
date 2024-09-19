@@ -1,0 +1,33 @@
+const Product = require("../models/product");
+
+exports.addProduct = (req, res) => {
+  const product = new Product({ ...req.body, id: null });
+  console.log(product);
+  product.save();
+  res.status(200).send({ message: "Product was added successfully!!" });
+};
+
+exports.getProducts = (req, res) => {
+  Product.fetchAll((products) => {
+    if (products.length !== 0) {
+      const productsData = JSON.stringify(products);
+      res.status(200).send(productsData);
+    } else {
+      res.status(200).send({ message: "No products found!" });
+    }
+  });
+};
+
+exports.editProduct = (req, res) => {
+  const product = new Product({ ...req.body, id: req.params.productId });
+
+  product.save();
+  res.status(200).send({ message: "Product updated successfully" });
+};
+
+exports.deleteProduct = (req, res) => {
+  const productId = req.body.productId;
+  const updatedProducts = Product.deleteById(productId);
+  console.log(updatedProducts);
+  res.status(200).send({ message: "Product was deleted!" });
+};
