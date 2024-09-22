@@ -9,7 +9,7 @@ const ProductItem = ({ adminPage, products }) => {
     <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
       {products.length !== 0 &&
         products.map((product) => (
-          <div className="group relative" key={product.id}>
+          <div className="group relative" key={product._id}>
             <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
               <img
                 src={product.image}
@@ -20,7 +20,7 @@ const ProductItem = ({ adminPage, products }) => {
             <div className="mt-4 flex justify-between">
               <div>
                 <h3 className="text-sm text-gray-700">
-                  <Link to={`/products/${product.id}`}>{product.title}</Link>
+                  <Link to={`/products/${product._id}`}>{product.title}</Link>
                 </h3>
                 <p className="mt-2 text-sm text-gray-700 mx-2">
                   {product.description}
@@ -45,7 +45,7 @@ const ProductItem = ({ adminPage, products }) => {
             </p>
             {!adminPage && (
               <Form method="POST">
-                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="productId" value={product._id} />
                 <input type="hidden" name="actionType" value="cart-action" />
                 <button
                   type="submit"
@@ -59,14 +59,14 @@ const ProductItem = ({ adminPage, products }) => {
             {adminPage && (
               <div className="flex mx-2 mt-2">
                 <Link
-                  to={`/admin/edit-product/${product.id}`}
+                  to={`/admin/edit-product/${product._id}`}
                   className="mt-4 mx-1 flex w-full items-center justify-center rounded-md border border-transparent bg-blue-600 px-5 py-2 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
                   <span className="mx-2">Edit </span>
                   <EditIcon />
                 </Link>
                 <Form method="DELETE">
-                  <input type="hidden" name="productId" value={product.id} />
+                  <input type="hidden" name="productId" value={product._id} />
                   <input type="hidden" name="actionType" value="" />
                   <button
                     type="submit"
@@ -111,7 +111,7 @@ export async function action({ request }) {
     );
   }
   await response.json();
-
+  // return;
   return redirect(
     actionType === "cart-action" ? "/shoppingBag" : "/admin/products"
   );

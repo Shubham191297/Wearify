@@ -1,6 +1,6 @@
 const express = require("express");
 
-const shopController = require("../controllers/shop");
+const shopController = require("../controllers/shop.js");
 
 const router = express.Router();
 
@@ -12,10 +12,10 @@ router.get("/shoppingBag", shopController.getShoppingBag);
 
 router.post("/shoppingBag", shopController.postShoppingBag);
 
-router.delete("/shoppingBagItem", shopController.deleteItemShoppingBag);
+// router.delete("/shoppingBagItem", shopController.deleteItemShoppingBag);
 
-router.get("/orders", shopController.getOrders);
+// router.get("/orders", shopController.getOrders);
 
-router.get("/checkout", shopController.getCheckout);
+// router.get("/checkout", shopController.getCheckout);
 
 module.exports = router;

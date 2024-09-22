@@ -6,7 +6,7 @@ const ShoppingBagItems = ({ shoppingBagItems }) => {
     <div className="flow-root">
       <ul className="my-6 divide-y divide-gray-200 px-20">
         {shoppingBagItems.map((item) => (
-          <li className="flex py-6" key={item.productData.id}>
+          <li className="flex py-6" key={item.productData._id}>
             <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
               <img
                 src={item.productData.image}
