@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Form } from "react-router-dom";
 import NoProductsBag from "../pages/NoProductsBag";
 import ShoppingBagItems from "./ShoppingBagItems";
 
@@ -31,13 +31,16 @@ const ShoppingBagOverview = ({ shoppingBag }) => {
                 <p>Subtotal</p>
                 <p>Rs. {shoppingBag.totalPrice}</p>
               </div>
-              <div className="mt-6 flex-1">
-                <Link
-                  to="/checkout"
-                  className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-2 py-3 mx-40 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
-                >
-                  Checkout
-                </Link>
+              <div className="mt-6 flex-1 ">
+                <Form method="POST">
+                  <input type="hidden" name="bagId" value={shoppingBag.id} />
+                  <button
+                    className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-2 py-3 mx-40 w-3/4 text-base font-medium text-white shadow-sm hover:bg-indigo-700"
+                    type="submit"
+                  >
+                    Checkout
+                  </button>
+                </Form>
               </div>
               <div className="mt-6 flex justify-center text-center text-sm text-gray-500">
                 <p>

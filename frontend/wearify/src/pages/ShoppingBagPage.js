@@ -43,16 +43,35 @@ export function loader() {
 
 export async function action({ request }) {
   const formData = await request.formData();
-  const productId = formData.get("productId");
-  console.log(request.method);
-  console.log(productId);
 
-  const resData = await fetch("http://localhost:5000/shoppingBagItem", {
+  const deleteItemAction = request.method === "DELETE";
+
+  const url =
+    "http://localhost:5000/" +
+    (deleteItemAction ? "shoppingBagItem" : "orders");
+
+  const bodyData = deleteItemAction
+    ? { productId: formData.get("productId") }
+    : { shoppingBagId: formData.get("bagId") };
+
+  const resData = await fetch(url, {
     method: request.method,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ productId: productId }),
+    body: JSON.stringify(bodyData),
   });
-  const deletedItemData = await resData.json();
-  console.log(deletedItemData);
-  return redirect("/shoppingBag");
+
+  if (!resData.ok) {
+    throw new Error("Failed to place the order");
+  }
+
+  const data = await resData.json();
+
+  console.log({
+    message: deleteItemAction
+      ? "Deleted item from shopping bag"
+      : "Order placed successfully!!",
+    data: data,
+  });
+
+  return redirect(deleteItemAction ? "/shoppingBag" : "/orders");
 }

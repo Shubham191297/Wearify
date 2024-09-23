@@ -14,6 +14,7 @@ router.post("/shoppingBag", shopController.postShoppingBag);
 
 router.delete("/shoppingBagItem", shopController.deleteItemShoppingBag);
 
+router.post("/orders", shopController.postOrder);
 // router.get("/orders", shopController.getOrders);
 
 // router.get("/checkout", shopController.getCheckout);
