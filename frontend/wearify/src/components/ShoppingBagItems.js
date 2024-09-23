@@ -32,7 +32,7 @@ const ShoppingBagItems = ({ shoppingBagItems }) => {
                     <input
                       type="hidden"
                       name="productId"
-                      value={item.productData.id}
+                      value={item.productData._id}
                     />
                     <button className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition duration-300 ease-in-out transform hover:scale-105 flex items-center">
                       Remove

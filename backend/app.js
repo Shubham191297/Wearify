@@ -17,7 +17,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
-  User.findByPk(1)
+  User.findByPk(2)
     .then((user) => {
       req.user = user;
       if (user.shoppingBagId) {
@@ -27,7 +27,6 @@ app.use((req, res, next) => {
       const shoppingBag = new ShoppingBag(user.id);
       return shoppingBag.save().then((result) => {
         req.user.shoppingBagId = result._id.toString();
-        console.log("here!!");
         return req.user.save();
       });
     })

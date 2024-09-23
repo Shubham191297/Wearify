@@ -1,5 +1,4 @@
 const Bag = require("../models/bag.js");
-const Cart = require("../models/cart.js");
 const Product = require("../models/product.js");
 
 exports.getProducts = (req, res) => {
@@ -25,7 +24,6 @@ exports.getProduct = (req, res) => {
 };
 
 exports.getShoppingBag = (req, res) => {
-  console.log(req.user.shoppingBagId);
   Bag.getShoppingBag(req.user.shoppingBagId)
     .then((bag) => {
       Product.fetchAll().then((products) => {
@@ -55,12 +53,10 @@ exports.getShoppingBag = (req, res) => {
 exports.postShoppingBag = (req, res) => {
   const prodId = req.body.productId;
   const shoppingBagId = req.user.shoppingBagId;
-  console.log(req.user);
 
   console.log(prodId);
   Product.findById(prodId)
     .then((product) => {
-      console.log(product);
       return Bag.addProduct(shoppingBagId, prodId, product.price);
     })
     .then((bag) =>
@@ -71,15 +67,25 @@ exports.postShoppingBag = (req, res) => {
     .catch((err) => console.log(err));
 };
 
-// exports.deleteItemShoppingBag = (req, res) => {
-//   const prodId = req.body.productId;
-//   Product.findById(prodId, (product) => {
-//     Cart.deleteProductFromCart(prodId, product.price);
-//     res
-//       .status(200)
-//       .send({ message: "Product deleted successfully", product: product });
-//   });
-// };
+exports.deleteItemShoppingBag = (req, res) => {
+  const prodId = req.body.productId;
+
+  Product.findById(prodId)
+    .then((product) => {
+      return Bag.deleteProductFromBag(
+        req.user.shoppingBagId,
+        prodId,
+        product.price
+      );
+    })
+    .then((updatedBag) => {
+      res.status(200).send({
+        message: "Product deleted from bag successfully",
+        updatedBag: updatedBag,
+      });
+    })
+    .catch((err) => console.log(err));
+};
 
 // exports.getCheckout = (req, res) => {};
 

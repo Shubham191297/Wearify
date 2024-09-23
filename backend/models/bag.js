@@ -10,9 +10,7 @@ class Bag {
 
   static addProduct(shoppingBagId, prodId, price) {
     const db = getDb();
-    return db
-      .collection("ShoppingBag")
-      .findOne({ _id: new mongodb.ObjectId(shoppingBagId) })
+    return Bag.getShoppingBag(shoppingBagId)
       .then((shoppingBag) => {
         const existingProduct = shoppingBag.products.find(
           (product) => product.id === prodId
@@ -31,20 +29,69 @@ class Bag {
           shoppingBag.products = [...shoppingBag.products, updatedProduct];
         }
         shoppingBag.totalPrice = shoppingBag.totalPrice + +price;
-        return db
-          .collection("ShoppingBag")
-          .updateOne(
-            { _id: new mongodb.ObjectId(shoppingBagId) },
-            { $set: shoppingBag }
-          );
+
+        return Bag.updateShoppingBag(shoppingBag);
       })
       .then((result) => result)
       .catch((err) => console.log(err));
   }
 
-  static deleteProductFromBag(shoppingBagId, prodId, price) {}
+  static deleteProductFromBag(shoppingBagId, prodId, price) {
+    const db = getDb();
+    return Bag.getShoppingBag(shoppingBagId)
+      .then((shoppingBag) => {
+        const existingProduct = shoppingBag.products.find(
+          (product) => prodId === product.id
+        );
+        const existingProductIndex = shoppingBag.products.findIndex(
+          (product) => prodId === product.id
+        );
 
-  static deleteProduct(prodId, price) {}
+        if (existingProduct.quantity === 1) {
+          shoppingBag.products = shoppingBag.products.filter(
+            (product) => prodId !== product.id.toString()
+          );
+        } else {
+          const updatedProduct = shoppingBag.products[existingProductIndex];
+          updatedProduct.quantity = updatedProduct.quantity - 1;
+          shoppingBag.products[existingProductIndex] = updatedProduct;
+        }
+        shoppingBag.totalPrice = shoppingBag.totalPrice - +price;
+
+        return Bag.updateShoppingBag(shoppingBag);
+      })
+      .then((result) => result)
+      .catch((err) => console.log(err));
+  }
+
+  static deleteProduct(prodId, price) {
+    const db = getDb();
+    return db
+      .collection("ShoppingBag")
+      .find()
+      .toArray()
+      .then((shoppingBags) => {
+        shoppingBags = shoppingBags.map((bag) => {
+          const deletedProduct = bag.products.find(
+            (prod) => prod.id === prodId
+          );
+
+          bag.products = bag.products.filter((prod) => prod.id !== prodId);
+
+          bag.totalPrice = bag.totalPrice - deletedProduct.quantity * price;
+
+          return bag;
+        });
+
+        const bagUpdatePromises = shoppingBags.map((bag) => {
+          return Bag.updateShoppingBag(bag);
+        });
+
+        return Promise.all(bagUpdatePromises);
+      })
+      .then((result) => result)
+      .catch((err) => console.log(err));
+  }
 
   save() {
     const db = getDb();
@@ -65,6 +112,13 @@ class Bag {
       .findOne({ _id: new mongodb.ObjectId(bagId) })
       .then((bag) => bag)
       .catch((err) => console.log(err));
+  }
+
+  static updateShoppingBag(bag) {
+    const db = getDb();
+    return db
+      .collection("ShoppingBag")
+      .updateOne({ _id: new mongodb.ObjectId(bag._id) }, { $set: bag });
   }
 }
 

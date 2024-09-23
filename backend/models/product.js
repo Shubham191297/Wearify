@@ -1,4 +1,5 @@
 const mongodb = require("mongodb");
+const Bag = require("./bag");
 const getDb = require("../utils/mongo-database").getDb;
 
 class Product {
@@ -63,14 +64,21 @@ class Product {
 
   static deleteById(productId) {
     const db = getDb();
-    return db
-      .collection("products")
-      .deleteOne({
-        _id: new mongodb.ObjectId(productId),
+
+    return Product.findById(productId)
+      .then((product) => {
+        return Bag.deleteProduct(productId, product.price);
       })
-      .then((result) => {
-        return result;
-      })
+      .then((result) =>
+        db
+          .collection("products")
+          .deleteOne({
+            _id: new mongodb.ObjectId(productId),
+          })
+          .then((result) => {
+            return result;
+          })
+      )
       .catch((err) => console.log(err));
   }
 }

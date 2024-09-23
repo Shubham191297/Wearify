@@ -12,7 +12,7 @@ router.get("/shoppingBag", shopController.getShoppingBag);
 
 router.post("/shoppingBag", shopController.postShoppingBag);
 
-// router.delete("/shoppingBagItem", shopController.deleteItemShoppingBag);
+router.delete("/shoppingBagItem", shopController.deleteItemShoppingBag);
 
 // router.get("/orders", shopController.getOrders);
 
