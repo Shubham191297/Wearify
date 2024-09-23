@@ -1,5 +1,4 @@
 import React, { Suspense } from "react";
-// import { useState, useEffect } from "react";
 import { useLocation, Await, json, defer } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import ProductList from "../components/ProductList";

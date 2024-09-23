@@ -17,11 +17,10 @@ app.use(cors());
 app.use(express.json());
 
 app.use((req, res, next) => {
-  User.findByPk(1)
+  User.findByPk(2)
     .then((user) => {
       req.user = user;
       if (user.shoppingBagId) {
-        console.log("Shopping Bag already exists!");
         return;
       }
       const shoppingBag = new ShoppingBag(user.id);

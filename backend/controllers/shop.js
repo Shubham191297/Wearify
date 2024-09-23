@@ -116,4 +116,10 @@ exports.postOrder = (req, res) => {
 
 // exports.getCheckout = (req, res) => {};
 
-// exports.getOrders = (req, res) => {};
+exports.getOrders = (req, res) => {
+  Order.getOrders(req.user.id)
+    .then((orders) => {
+      res.status(200).send(orders);
+    })
+    .catch((err) => console.log(err));
+};

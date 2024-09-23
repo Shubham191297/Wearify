@@ -14,10 +14,12 @@ import ShoppingBagPage, {
   loader as shoppingBagLoader,
   action as shoppingBagActions,
 } from "./pages/ShoppingBagPage";
+import { loader as ordersLoader } from "./pages/OrdersPage";
 import { action as productListActions } from "./components/ProductList";
 import { action as productActions } from "./components/ProductForm";
 import ErrorPage from "./pages/ErrorPage";
 import DefaultPage from "./pages/DefaultPage";
+import OrdersPage from "./pages/OrdersPage";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +51,7 @@ const router = createBrowserRouter([
         element: <ShoppingBagPage />,
       },
       { path: "checkout", element: <DefaultPage /> },
-      { path: "orders", element: <DefaultPage /> },
+      { path: "orders", loader: ordersLoader, element: <OrdersPage /> },
       {
         path: "*",
         element: <ErrorPage />,
