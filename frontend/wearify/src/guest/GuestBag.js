@@ -74,6 +74,9 @@ export const mergeGuestShoppingBag = async (guestBagData) => {
     credentials: "include",
   });
   const mergedBag = await res.json();
-  sessionStorage.setItem("guestShoppingBag", { items: [], totalPrice: 0 });
+  sessionStorage.setItem(
+    "guestShoppingBag",
+    JSON.stringify({ items: [], totalPrice: 0 })
+  );
   return mergedBag;
 };
