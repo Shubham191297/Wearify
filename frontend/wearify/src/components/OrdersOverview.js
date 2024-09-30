@@ -8,7 +8,7 @@ const OrdersOverview = ({ orders }) => {
     <div>
       {noOrders && <NoOrders />}
       {!noOrders && (
-        <div className="w-11/12 mx-auto">
+        <div className="w-3/4 mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mt-3">Your Orders</h1>
           <ul className="mx-auto border border-slate-300 rounded-md mt-4">
             {orders.map((order) => (

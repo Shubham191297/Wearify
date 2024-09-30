@@ -119,7 +119,6 @@ const ProductForm = ({ product, editMode }) => {
             id="price"
             name="price"
             type="number"
-            step="0.01"
             required
             onChange={inputChangeHandler}
             value={productDetails.price}

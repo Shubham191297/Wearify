@@ -11,7 +11,7 @@ const ShoppingBagOverview = ({ shoppingBag }) => {
     <div className="flex w-full justify-center mt-6">
       {shoppingBagEmpty && <NoProductsBag />}
       {!shoppingBagEmpty && (
-        <div className="pointer-events-auto border-2 rounded-md w-4/5 max-h-fit flex flex-col">
+        <div className="pointer-events-auto border-2 rounded-md w-3/4 flex flex-col">
           <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-6 justify-center">
             <h1
               className="text-xl font-medium text-gray-900"

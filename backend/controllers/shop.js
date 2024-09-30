@@ -1,9 +1,9 @@
-const Bag = require("../models/bag.js");
+const ShoppingBag = require("../models/bag.js");
 const Order = require("../models/order.js");
 const Product = require("../models/product.js");
 
 exports.getProducts = (req, res) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       if (products.length !== 0) {
         const productsData = JSON.stringify(products);
@@ -17,7 +17,6 @@ exports.getProducts = (req, res) => {
 
 exports.getProduct = (req, res) => {
   const prodId = req.params.productId;
-  console.log(prodId);
 
   Product.findById(prodId)
     .then((product) => res.status(200).send(product))
@@ -25,14 +24,17 @@ exports.getProduct = (req, res) => {
 };
 
 exports.getShoppingBag = (req, res) => {
-  Bag.getShoppingBag(req.user.shoppingBagId)
+  const shoppingBagId = req.user.shoppingBagId;
+
+  ShoppingBag.findById(shoppingBagId)
     .then((bag) => {
-      Product.fetchAll().then((products) => {
+      Product.find().then((products) => {
         const bagProducts = [];
         for (product of products) {
           const bagProductData = bag.products.find(
             (prod) => prod.id === product._id.toString()
           );
+
           if (bagProductData) {
             bagProducts.push({
               productData: product,
@@ -40,6 +42,7 @@ exports.getShoppingBag = (req, res) => {
             });
           }
         }
+
         res.status(200).send(
           JSON.stringify({
             totalPrice: bag.totalPrice,
@@ -56,30 +59,36 @@ exports.postShoppingBag = (req, res) => {
   const prodId = req.body.productId;
   const shoppingBagId = req.user.shoppingBagId;
 
-  console.log(prodId);
+  let product;
+
   Product.findById(prodId)
-    .then((product) => {
-      return Bag.addProduct(shoppingBagId, prodId, product.price);
+    .then((productToBeAdded) => {
+      product = productToBeAdded;
+      return ShoppingBag.findById(shoppingBagId);
     })
-    .then((bag) =>
+    .then((shoppingBag) => {
+      return shoppingBag.addProduct(product);
+    })
+    .then((result) =>
       res
         .status(200)
-        .send({ message: "product added to bag!", shoppingBag: bag })
+        .send({ message: "product added to bag!", shoppingBag: result })
     )
     .catch((err) => console.log(err));
 };
 
 exports.deleteItemShoppingBag = (req, res) => {
   const prodId = req.body.productId;
+  const shoppingBagId = req.user.shoppingBagId;
+
+  let product;
 
   Product.findById(prodId)
-    .then((product) => {
-      return Bag.deleteProductFromBag(
-        req.user.shoppingBagId,
-        prodId,
-        product.price
-      );
+    .then((productToBeRemoved) => {
+      product = productToBeRemoved;
+      return ShoppingBag.findById(shoppingBagId);
     })
+    .then((shoppingBag) => shoppingBag.deleteProductFromBag(product))
     .then((updatedBag) => {
       res.status(200).send({
         message: "Product deleted from bag successfully",
@@ -91,21 +100,30 @@ exports.deleteItemShoppingBag = (req, res) => {
 
 exports.postOrder = (req, res) => {
   const bagId = req.body.shoppingBagId;
-  let orderProducts = [];
-  let orderPrice = 0;
+  let bagProducts;
+  let bagTotalPrice;
 
-  Bag.getShoppingBag(bagId)
+  ShoppingBag.findById(bagId)
     .then((bag) => {
-      orderProducts = bag.products;
-      orderPrice = bag.totalPrice;
-      return Bag.updateShoppingBag(bag, "clean");
+      bagProducts = bag.products;
+      bagTotalPrice = bag.totalPrice;
+
+      return bag.cleanBag();
     })
     .then(() => {
-      const order = new Order(orderProducts, orderPrice, {
+      const userData = {
         id: req.user.id,
         name: req.user.name,
         email: req.user.email,
+      };
+
+      const order = new Order({
+        products: bagProducts,
+        cost: bagTotalPrice,
+        user: userData,
+        placedAt: new Date(),
       });
+
       return order.save();
     })
     .then(() => {
@@ -114,12 +132,33 @@ exports.postOrder = (req, res) => {
     .catch((err) => console.log(err));
 };
 
-// exports.getCheckout = (req, res) => {};
-
 exports.getOrders = (req, res) => {
-  Order.getOrders(req.user.id)
+  const userId = req.user.id;
+
+  Order.find({ "user.id": userId })
     .then((orders) => {
-      res.status(200).send(orders);
+      return Order.getOrders(orders);
+    })
+    .then((ordersData) => {
+      res.status(200).send(ordersData);
+    })
+    .catch((err) => console.log(err));
+};
+
+exports.mergeGuestShoppingBagData = (req, res) => {
+  const shoppingBagId = req.user.shoppingBagId;
+
+  // res.status(200).send({ message: "Bags merged successfully" });
+
+  ShoppingBag.mergeShoppingBagDataWithGuest(
+    shoppingBagId,
+    req.body.guestBagData
+  )
+    .then((result) => {
+      res.status(200).send({
+        message: "Shopping Bags merged!!",
+        mergedBag: result,
+      });
     })
     .catch((err) => console.log(err));
 };

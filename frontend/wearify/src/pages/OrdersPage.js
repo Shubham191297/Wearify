@@ -19,13 +19,14 @@ const OrdersPage = () => {
 export default OrdersPage;
 
 async function loadOrders() {
-  const response = await fetch("http://localhost:5000/orders/");
+  const response = await fetch("http://localhost:5000/orders/", {
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw json({ message: "Unable to fetch orders" }, { status: 500 });
   } else {
     const orders = await response.json();
-
     return orders;
   }
 }

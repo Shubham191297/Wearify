@@ -1,13 +1,16 @@
 import React, { Suspense } from "react";
 import { json, defer, useLoaderData, Await, redirect } from "react-router-dom";
 import ShoppingBagOverview from "../components/ShoppingBagOverview";
+import {
+  loadGuestShoppingBag,
+  removeItemFromGuestBag,
+} from "../guest/GuestBag";
 
 const ShoppingBagPage = () => {
   const { shoppingBag } = useLoaderData();
 
   return (
     <div>
-      {/* <NoProductsBag /> */}
       <Suspense fallback={<p style={{ textAlign: "center" }}>Loading...</p>}>
         <Await resolve={shoppingBag}>
           {(loadShoppingBag) => (
@@ -22,7 +25,16 @@ const ShoppingBagPage = () => {
 export default ShoppingBagPage;
 
 async function loadShoppingBag() {
-  const response = await fetch("http://localhost:5000/shoppingBag/");
+  const guestShoppingBag = !sessionStorage.getItem("user");
+  // const guestBagExist = sessionStorage.getItem("guestShoppingBag");
+
+  if (guestShoppingBag) {
+    return loadGuestShoppingBag();
+  }
+
+  const response = await fetch("http://localhost:5000/shoppingBag/", {
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw json(
@@ -46,6 +58,17 @@ export async function action({ request }) {
 
   const deleteItemAction = request.method === "DELETE";
 
+  const guestShoppingBag = !sessionStorage.getItem("user");
+
+  if (guestShoppingBag && deleteItemAction) {
+    removeItemFromGuestBag(formData.get("productId"));
+    return null;
+  }
+
+  if (guestShoppingBag && !deleteItemAction) {
+    return redirect("/login");
+  }
+
   const url =
     "http://localhost:5000/" +
     (deleteItemAction ? "shoppingBagItem" : "orders");
@@ -58,6 +81,7 @@ export async function action({ request }) {
     method: request.method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(bodyData),
+    credentials: "include",
   });
 
   if (!resData.ok) {

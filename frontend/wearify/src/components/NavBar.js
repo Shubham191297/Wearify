@@ -1,6 +1,7 @@
-import React from "react";
-import { Disclosure } from "@headlessui/react";
+import React, { useContext } from "react";
+import { Button, Disclosure } from "@headlessui/react";
 import { Link, useLocation } from "react-router-dom";
+import AuthContext from "../context/auth";
 
 const navigation = [
   { name: "Home", href: "/", current: false },
@@ -13,7 +14,6 @@ const navigation = [
     current: false,
   },
   { name: "Orders", href: "/orders", current: false },
-  { name: "Checkout", href: "/checkout", current: false },
 ];
 
 function classNames(...classes) {
@@ -23,23 +23,33 @@ function classNames(...classes) {
 const NavBar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
+  const authCtx = useContext(AuthContext);
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            {/* <div className="flex flex-shrink-0 items-center">
-              <img
-                alt="Your Company"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                className="h-8 w-auto"
-              />
-            </div> */}
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4 ">
                 {navigation.map((item) => {
                   const activeTab = item.href === currentPath;
+                  const adminItem = item.href.startsWith("/admin");
+
+                  if (adminItem && !authCtx.user?.roleAdmin) {
+                    return null;
+                  }
+                  if (!authCtx.user?.isLoggedIn && item.name === "Orders") {
+                    return null;
+                  }
+                  if (
+                    !adminItem &&
+                    authCtx.user.roleAdmin &&
+                    item.name === "Shopping Bag"
+                  ) {
+                    return null;
+                  }
+
                   return (
                     <Link
                       key={item.name}
@@ -75,6 +85,46 @@ const NavBar = () => {
                 })}
               </div>
             </div>
+            {!authCtx.user?.isLoggedIn && (
+              <div className="ml-auto my-auto">
+                <Link
+                  to="/login"
+                  className={classNames(
+                    currentPath === "/login"
+                      ? "bg-gray-900 text-white"
+                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                    "rounded-md px-3 py-2 text-sm font-medium"
+                  )}
+                >
+                  Login
+                </Link>
+              </div>
+            )}
+            {authCtx.user.isLoggedIn && (
+              <div className="ml-auto my-auto">
+                <Button
+                  className={classNames(
+                    "text-gray-300 hover:bg-gray-700 hover:text-white",
+                    "rounded-md px-3 py-2 text-sm font-medium"
+                  )}
+                  onClick={async () => {
+                    const res = await fetch(
+                      "http://localhost:5000/auth/logout",
+                      {
+                        method: "POST",
+                        body: null,
+                        credentials: "include",
+                      }
+                    );
+                    const loggedOutInfo = await res.json();
+                    console.log(loggedOutInfo);
+                    authCtx.logout();
+                  }}
+                >
+                  Logout
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

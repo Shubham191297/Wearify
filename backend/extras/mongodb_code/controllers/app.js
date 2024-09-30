@@ -21,7 +21,6 @@ app.use((req, res, next) => {
     .then((user) => {
       req.user = user;
       if (user.shoppingBagId) {
-        console.log("Shopping Bag already exists!");
         return;
       }
       const shoppingBag = new ShoppingBag(user.id);

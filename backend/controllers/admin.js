@@ -1,7 +1,17 @@
 const Product = require("../models/product.js");
+const ShoppingBag = require("../models/bag.js");
 
 exports.addProduct = (req, res) => {
-  const product = new Product({ ...req.body, userId: req.user.id });
+  const { title, description, category, color, price, image } = req.body;
+  const product = new Product({
+    title: title,
+    description: description,
+    category: category,
+    color: color,
+    price: price,
+    image: image,
+    userId: req.user.id,
+  });
 
   product
     .save()
@@ -28,14 +38,19 @@ exports.getProducts = (req, res) => {
 };
 
 exports.editProduct = (req, res) => {
-  const product = new Product({
-    ...req.body,
-    _id: req.params.productId,
-    userId: req.user.id,
-  });
+  const { title, description, category, color, price, image } = req.body;
 
-  product
-    .save()
+  Product.findById(req.params.productId)
+    .then((product) => {
+      product.title = title;
+      product.description = description;
+      product.category = category;
+      product.color = color;
+      product.price = price;
+      product.image = image;
+
+      return product.save();
+    })
     .then((result) => {
       res.status(200).send({
         message: "Product updated successfully",
@@ -47,7 +62,10 @@ exports.editProduct = (req, res) => {
 
 exports.deleteProduct = (req, res) => {
   const productId = req.body.productId;
-  Product.deleteById(productId)
+
+  Product.findById(productId)
+    .then((product) => ShoppingBag.deleteProduct(productId, product.price))
+    .then(() => Product.findByIdAndDelete(productId))
     .then((result) => {
       res
         .status(200)

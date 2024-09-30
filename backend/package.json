@@ -16,8 +16,10 @@
   "dependencies": {
     "@sequelize/postgres": "^7.0.0-alpha.42",
     "body-parser": "^1.20.2",
+    "connect-pg-simple": "^10.0.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "express-session": "^1.18.0",
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
     "pg-hstore": "^2.3.4",

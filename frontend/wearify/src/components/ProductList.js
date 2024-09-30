@@ -3,6 +3,7 @@ import DeleteIcon from "../icons/DeleteIcon";
 import EditIcon from "../icons/EditIcon";
 import BagIcon from "../icons/BagIcon";
 import { Form, Link, redirect } from "react-router-dom";
+import { addItemToGuestBag } from "../guest/GuestBag";
 
 const ProductItem = ({ adminPage, products }) => {
   return (
@@ -91,6 +92,13 @@ export async function action({ request }) {
   const productId = formData.get("productId");
   const actionType = formData.get("actionType");
 
+  const guestShoppingBag = !sessionStorage.getItem("user");
+
+  if (guestShoppingBag && actionType === "cart-action") {
+    addItemToGuestBag(productId);
+    return redirect("/shoppingBag");
+  }
+
   const requestUrl =
     "http://localhost:5000/" +
     (actionType === "cart-action" ? "shoppingBag" : "admin/delete-product");
@@ -101,6 +109,7 @@ export async function action({ request }) {
     headers: {
       "Content-Type": "application/json",
     },
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -111,7 +120,7 @@ export async function action({ request }) {
     );
   }
   await response.json();
-  // return;
+
   return redirect(
     actionType === "cart-action" ? "/shoppingBag" : "/admin/products"
   );

@@ -1,12 +1,37 @@
-import React, { Suspense } from "react";
+import React, {
+  Suspense,
+  useContext,
+  useEffect,
+  useCallback,
+  useState,
+} from "react";
 import { useLocation, Await, json, defer } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import ProductList from "../components/ProductList";
+import AuthContext from "../context/auth";
 
 const ProductsPage = () => {
   const location = useLocation();
   const adminPage = location.pathname === "/admin/products";
   const { products } = useLoaderData();
+  const authCtx = useContext(AuthContext);
+  const [hasLoggedIn, setHasLoggedIn] = useState(false);
+
+  const loginUser = useCallback(
+    (username, roleAdmin) => {
+      authCtx.login(username, roleAdmin);
+      setHasLoggedIn(true);
+    },
+    [authCtx]
+  );
+
+  useEffect(() => {
+    const userInfo = sessionStorage.getItem("user");
+    if (userInfo && !hasLoggedIn) {
+      const parsedUser = JSON.parse(userInfo);
+      loginUser(parsedUser.username, parsedUser.roleAdmin);
+    }
+  }, [loginUser, hasLoggedIn]);
 
   return (
     <div className="bg-white">
@@ -29,12 +54,15 @@ const ProductsPage = () => {
 export default ProductsPage;
 
 async function loadProducts() {
-  const response = await fetch("http://localhost:5000/products/");
+  const response = await fetch("http://localhost:5000/products/", {
+    credentials: "include",
+  });
 
   if (!response.ok) {
     throw json({ message: "Unable to fetch products" }, { status: 500 });
   } else {
     const products = await response.json();
+    sessionStorage.setItem("products", JSON.stringify(products));
     return products;
   }
 }
