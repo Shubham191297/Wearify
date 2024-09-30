@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { Button, Disclosure } from "@headlessui/react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AuthContext from "../context/auth";
 
 const navigation = [
@@ -24,6 +24,7 @@ const NavBar = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   const authCtx = useContext(AuthContext);
+  const navigate = useNavigate();
 
   return (
     <Disclosure as="nav" className="bg-gray-800">
@@ -116,9 +117,9 @@ const NavBar = () => {
                         credentials: "include",
                       }
                     );
-                    const loggedOutInfo = await res.json();
-                    console.log(loggedOutInfo);
+                    await res.json();
                     authCtx.logout();
+                    navigate("/products");
                   }}
                 >
                   Logout

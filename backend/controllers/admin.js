@@ -10,7 +10,6 @@ exports.addProduct = (req, res) => {
     color: color,
     price: price,
     image: image,
-    userId: req.user.id,
   });
 
   product

@@ -188,6 +188,7 @@ export async function action({ request, params }) {
     method: request.method,
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(productData),
+    credentials: "include",
   });
   await product.json();
 

@@ -78,9 +78,11 @@ shoppingBagSchema.statics.deleteProduct = function (prodId, price) {
       shoppingBags = shoppingBags.map((bag) => {
         const deletedProduct = bag.products.find((prod) => prod.id === prodId);
 
-        bag.products = bag.products.filter((prod) => prod.id !== prodId);
+        if (deletedProduct) {
+          bag.products = bag.products.filter((prod) => prod.id !== prodId);
 
-        bag.totalPrice = bag.totalPrice - deletedProduct.quantity * price;
+          bag.totalPrice = bag.totalPrice - deletedProduct.quantity * price;
+        }
 
         return bag;
       });

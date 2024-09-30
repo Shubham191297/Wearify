@@ -9,6 +9,7 @@ import { useLocation, Await, json, defer } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import ProductList from "../components/ProductList";
 import AuthContext from "../context/auth";
+import ErrorPage from "../pages/ErrorPage";
 
 const ProductsPage = () => {
   const location = useLocation();
@@ -32,6 +33,16 @@ const ProductsPage = () => {
       loginUser(parsedUser.username, parsedUser.roleAdmin);
     }
   }, [loginUser, hasLoggedIn]);
+
+  const adminUser = authCtx.user.username === "AdminUser";
+  if (!adminUser && location.pathname.startsWith("/admin")) {
+    return (
+      <ErrorPage
+        statusCode={403}
+        message="Sorry you are unauthorized to access this page. It requires admin privileges"
+      />
+    );
+  }
 
   return (
     <div className="bg-white">
