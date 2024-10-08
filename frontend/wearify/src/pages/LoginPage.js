@@ -1,7 +1,9 @@
-import { Form, Link, redirect } from "react-router-dom";
+import { Form, Link, redirect, useActionData } from "react-router-dom";
 import { mergeGuestShoppingBag } from "../guest/GuestBag";
 
 const LoginPage = () => {
+  const errors = useActionData();
+
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
@@ -11,6 +13,9 @@ const LoginPage = () => {
       </div>
 
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        {errors?.message && (
+          <p className="text-md text-red-600 mb-4">{errors.message}</p>
+        )}
         <Form className="space-y-6" method="POST">
           <div className="text-left">
             <label
@@ -73,7 +78,7 @@ const LoginPage = () => {
         <p className="mt-10 text-center text-sm text-gray-500">
           Not a member?
           <Link
-            href="#"
+            to="/signup"
             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500 pl-5"
           >
             Register
@@ -100,15 +105,20 @@ export async function action({ request }) {
     body: JSON.stringify({ email: email, password: pass }),
   });
 
-  const loginInfo = await userData.json();
   let bagMerge;
+  const errors = {};
+
+  const loginInfo = await userData.json();
+  if (!userData.ok) {
+    errors.message = loginInfo.message;
+    return errors;
+  }
 
   if (loginInfo) {
     const guestBagData = JSON.parse(sessionStorage.getItem("guestShoppingBag"));
     let isAdmin = loginInfo.username === "AdminUser";
-    console.log(isAdmin);
 
-    if (guestBagData.items.length > 0 && !isAdmin) {
+    if (guestBagData?.items.length > 0 && !isAdmin) {
       bagMerge = await mergeGuestShoppingBag(guestBagData);
       console.log(bagMerge);
     }

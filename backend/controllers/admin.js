@@ -15,16 +15,16 @@ exports.addProduct = (req, res) => {
   product
     .save()
     .then((result) => {
-      res.status(200).send({
+      res.status(201).send({
         message: "Product was added successfully!!",
         productDetails: result,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.status(500).send({ message: "Unable to add product" }));
 };
 
 exports.getProducts = (req, res) => {
-  Product.fetchAll()
+  Product.find()
     .then((products) => {
       if (products.length !== 0) {
         const productsData = JSON.stringify(products);
@@ -33,7 +33,17 @@ exports.getProducts = (req, res) => {
         res.status(200).send({ message: "No products found!" });
       }
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to fetch products" })
+    );
+};
+
+exports.getProduct = (req, res) => {
+  const prodId = req.params.productId;
+
+  Product.findById(prodId)
+    .then((product) => res.status(200).send(product))
+    .catch((err) => res.status(404).send({ message: "Product not found" }));
 };
 
 exports.editProduct = (req, res) => {
@@ -56,7 +66,9 @@ exports.editProduct = (req, res) => {
         updatedProduct: result,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to modify product" })
+    );
 };
 
 exports.deleteProduct = (req, res) => {
@@ -67,8 +79,10 @@ exports.deleteProduct = (req, res) => {
     .then(() => Product.findByIdAndDelete(productId))
     .then((result) => {
       res
-        .status(200)
+        .status(204)
         .send({ message: "Product was deleted!", deletedProduct: result });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to delete product" })
+    );
 };

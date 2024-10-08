@@ -3,7 +3,10 @@ import RootLayout from "./layouts/RootLayout";
 import AddProduct from "./components/AddProduct";
 import HomePage from "./pages/HomePage";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import ProductsPage, { loader as productsLoader } from "./pages/ProductsPage";
+import ProductsPage, {
+  loader as productsLoader,
+  adminLoader as adminProductsLoader,
+} from "./pages/ProductsPage";
 import ProductDetails, {
   loader as productDetailsLoader,
 } from "./components/ProductDetails";
@@ -20,6 +23,7 @@ import { action as productActions } from "./components/ProductForm";
 import LoginPage, { action as loginActions } from "./pages/LoginPage";
 import ErrorPage from "./pages/ErrorPage";
 import OrdersPage from "./pages/OrdersPage";
+import SignupPage, { action as signupActions } from "./pages/SignupPage";
 
 const router = createBrowserRouter([
   {
@@ -33,7 +37,7 @@ const router = createBrowserRouter([
           {
             index: true,
             loader: productsLoader,
-            element: <ProductsPage />,
+            element: <ProductsPage key="products" />,
             action: productListActions,
           },
           {
@@ -52,10 +56,16 @@ const router = createBrowserRouter([
       },
       { path: "orders", loader: ordersLoader, element: <OrdersPage /> },
       { path: "login", action: loginActions, element: <LoginPage /> },
-      { path: "logout", element: null },
+      { path: "signup", action: signupActions, element: <SignupPage /> },
       {
         path: "*",
-        element: <ErrorPage />,
+        element: (
+          <ErrorPage
+            status={404}
+            message="Not Found"
+            description="Sorry, we couldn’t find the page you’re looking for."
+          />
+        ),
       },
     ],
   },
@@ -66,9 +76,9 @@ const router = createBrowserRouter([
       { index: true, element: <ProductsPage /> },
       {
         path: "products",
-        loader: productsLoader,
+        loader: adminProductsLoader,
         action: productListActions,
-        element: <ProductsPage />,
+        element: <ProductsPage isAdmin={true} key="admin-products" />,
       },
       { path: "add-product", element: <AddProduct />, action: productActions },
       {
@@ -77,6 +87,16 @@ const router = createBrowserRouter([
         loader: editProductLoader,
         action: productActions,
         element: <EditProduct />,
+      },
+      {
+        path: "*",
+        element: (
+          <ErrorPage
+            status={404}
+            message="Not Found"
+            description="Sorry, we couldn’t find the page you’re looking for."
+          />
+        ),
       },
     ],
   },

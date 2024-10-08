@@ -13,6 +13,7 @@ const User = sequelize.define("user", {
   shoppingBagId: {
     type: Sequelize.STRING,
   },
+  password: Sequelize.STRING,
 });
 
 module.exports = User;

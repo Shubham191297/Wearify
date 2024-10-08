@@ -12,7 +12,9 @@ exports.getProducts = (req, res) => {
         res.status(200).send({ message: "No products found!" });
       }
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to load products!!" })
+    );
 };
 
 exports.getProduct = (req, res) => {
@@ -20,7 +22,9 @@ exports.getProduct = (req, res) => {
 
   Product.findById(prodId)
     .then((product) => res.status(200).send(product))
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(404).send({ message: "Unable to find product" })
+    );
 };
 
 exports.getShoppingBag = (req, res) => {
@@ -52,7 +56,9 @@ exports.getShoppingBag = (req, res) => {
         );
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to load shopping bag" })
+    );
 };
 
 exports.postShoppingBag = (req, res) => {
@@ -71,10 +77,12 @@ exports.postShoppingBag = (req, res) => {
     })
     .then((result) =>
       res
-        .status(200)
+        .status(201)
         .send({ message: "product added to bag!", shoppingBag: result })
     )
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to Add product to Bag" })
+    );
 };
 
 exports.deleteItemShoppingBag = (req, res) => {
@@ -90,12 +98,14 @@ exports.deleteItemShoppingBag = (req, res) => {
     })
     .then((shoppingBag) => shoppingBag.deleteProductFromBag(product))
     .then((updatedBag) => {
-      res.status(200).send({
+      res.status(204).send({
         message: "Product deleted from bag successfully",
         updatedBag: updatedBag,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ messagge: "Unable to delete product from bag" })
+    );
 };
 
 exports.postOrder = (req, res) => {
@@ -127,9 +137,11 @@ exports.postOrder = (req, res) => {
       return order.save();
     })
     .then(() => {
-      res.status(200).send({ message: "" });
+      res.status(201).send({ message: "Order created" });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to place order!" })
+    );
 };
 
 exports.getOrders = (req, res) => {
@@ -142,13 +154,11 @@ exports.getOrders = (req, res) => {
     .then((ordersData) => {
       res.status(200).send(ordersData);
     })
-    .catch((err) => console.log(err));
+    .catch((err) => res.send(500).send({ message: "Unable to get orders!" }));
 };
 
 exports.mergeGuestShoppingBagData = (req, res) => {
   const shoppingBagId = req.user.shoppingBagId;
-
-  // res.status(200).send({ message: "Bags merged successfully" });
 
   ShoppingBag.mergeShoppingBagDataWithGuest(
     shoppingBagId,
@@ -160,5 +170,7 @@ exports.mergeGuestShoppingBagData = (req, res) => {
         mergedBag: result,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res.status(500).send({ message: "Unable to generate shopping bag!!" })
+    );
 };
