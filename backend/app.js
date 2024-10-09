@@ -3,6 +3,8 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const psSequelize = require("./utils/pgsql-database");
 const mongoose = require("mongoose");
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
 
 const User = require("./models/user");
 const ShoppingBag = require("./models/bag");
@@ -23,6 +25,10 @@ app.use(
 );
 app.use(express.json());
 app.use(sessionData);
+app.use(cookieParser());
+
+const csrfToken = csrf({ cookie: true });
+app.use(csrfToken);
 
 app.use((req, res, next) => {
   if (req.session?.username) {

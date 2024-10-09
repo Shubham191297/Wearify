@@ -14,7 +14,7 @@ const SignupPage = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {errors?.email && (
+          {errors?.message && (
             <p className="text-sm text-red-600 mb-4">{errors.email}</p>
           )}
           <Form className="space-y-6" method="POST">
@@ -121,7 +121,8 @@ export async function action({ request }) {
   const errors = {};
 
   if (confirmpass !== password) {
-    return null;
+    errors.message = "Entered passwords do not match!";
+    return errors;
   }
 
   const res = await fetch("http://localhost:5000/auth/signup", {
@@ -136,7 +137,7 @@ export async function action({ request }) {
   const signupInfo = await res.json();
 
   if (!res.ok) {
-    errors.email = signupInfo.message;
+    errors.message = signupInfo.message;
     return errors;
   }
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { useState } from "react";
+import CustomError from "../layouts/CustomError";
 
 const AuthContext = React.createContext({
   user: { isLoggedIn: Boolean, username: String, roleAdmin: Boolean },
@@ -49,3 +50,18 @@ export const AuthProvider = (props) => {
 };
 
 export default AuthContext;
+
+export async function getCSRFToken() {
+  const response = await fetch("http://localhost:5000/auth/csrfToken", {
+    credentials: "include",
+  });
+  const tokenData = await response.json();
+  if (!response.ok) {
+    throw new CustomError(
+      response.statusText,
+      tokenData.message,
+      response.status
+    );
+  }
+  return tokenData.CSRFToken;
+}

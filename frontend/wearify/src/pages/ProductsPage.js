@@ -8,7 +8,7 @@ import React, {
 import { Await, defer } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import ProductList from "../components/ProductList";
-import AuthContext from "../context/auth";
+import AuthContext, { getCSRFToken } from "../context/auth";
 import ErrorPage from "./ErrorPage";
 import CustomError from "../layouts/CustomError";
 
@@ -54,10 +54,15 @@ const ProductsPage = ({ adminPage = false }) => {
 export default ProductsPage;
 
 async function loadProducts(isAdmin) {
+  const csrfToken = await getCSRFToken();
+
   const response = await fetch(
     "http://localhost:5000/" + (isAdmin ? "admin/products/" : "products/"),
     {
       credentials: "include",
+      headers: {
+        "X-CSRF-TOKEN": csrfToken,
+      },
     }
   );
 

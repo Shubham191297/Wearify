@@ -5,6 +5,8 @@ import {
   loadGuestShoppingBag,
   removeItemFromGuestBag,
 } from "../guest/GuestBag";
+import CustomError from "../layouts/CustomError";
+import ErrorPage from "./ErrorPage";
 
 const ShoppingBagPage = () => {
   const { shoppingBag } = useLoaderData();
@@ -12,7 +14,7 @@ const ShoppingBagPage = () => {
   return (
     <div>
       <Suspense fallback={<p style={{ textAlign: "center" }}>Loading...</p>}>
-        <Await resolve={shoppingBag}>
+        <Await resolve={shoppingBag} errorElement={<ErrorPage />}>
           {(loadShoppingBag) => (
             <ShoppingBagOverview shoppingBag={loadShoppingBag} />
           )}
@@ -84,11 +86,11 @@ export async function action({ request }) {
     credentials: "include",
   });
 
-  if (!resData.ok) {
-    throw new Error("Failed to place the order");
-  }
-
   const data = await resData.json();
+
+  if (!resData.ok) {
+    throw new CustomError(resData.statusText, data.message, resData.status);
+  }
 
   console.log({
     message: deleteItemAction
