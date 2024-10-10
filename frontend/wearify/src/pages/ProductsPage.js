@@ -61,7 +61,7 @@ async function loadProducts(isAdmin) {
     {
       credentials: "include",
       headers: {
-        "X-CSRF-TOKEN": csrfToken,
+        "X-CSRF-Token": csrfToken,
       },
     }
   );

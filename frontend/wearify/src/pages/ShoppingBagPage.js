@@ -7,6 +7,7 @@ import {
 } from "../guest/GuestBag";
 import CustomError from "../layouts/CustomError";
 import ErrorPage from "./ErrorPage";
+import { getCSRFToken } from "../context/auth";
 
 const ShoppingBagPage = () => {
   const { shoppingBag } = useLoaderData();
@@ -34,8 +35,12 @@ async function loadShoppingBag() {
     return loadGuestShoppingBag();
   }
 
+  const csrfToken = await getCSRFToken();
   const response = await fetch("http://localhost:5000/shoppingBag/", {
     credentials: "include",
+    headers: {
+      "X-CSRF-Token": csrfToken,
+    },
   });
 
   if (!response.ok) {
@@ -57,6 +62,7 @@ export function loader() {
 
 export async function action({ request }) {
   const formData = await request.formData();
+  const csrfToken = await getCSRFToken();
 
   const deleteItemAction = request.method === "DELETE";
 
@@ -81,7 +87,7 @@ export async function action({ request }) {
 
   const resData = await fetch(url, {
     method: request.method,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
     body: JSON.stringify(bodyData),
     credentials: "include",
   });
@@ -91,13 +97,6 @@ export async function action({ request }) {
   if (!resData.ok) {
     throw new CustomError(resData.statusText, data.message, resData.status);
   }
-
-  console.log({
-    message: deleteItemAction
-      ? "Deleted item from shopping bag"
-      : "Order placed successfully!!",
-    data: data,
-  });
 
   return redirect(deleteItemAction ? "/shoppingBag" : "/orders");
 }

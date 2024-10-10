@@ -4,6 +4,7 @@ import EditIcon from "../icons/EditIcon";
 import BagIcon from "../icons/BagIcon";
 import { Form, Link, redirect } from "react-router-dom";
 import { addItemToGuestBag } from "../guest/GuestBag";
+import { getCSRFToken } from "../context/auth";
 
 const ProductItem = ({ adminPage, products }) => {
   return (
@@ -91,6 +92,7 @@ export async function action({ request }) {
   const formData = await request.formData();
   const productId = formData.get("productId");
   const actionType = formData.get("actionType");
+  const csrfToken = await getCSRFToken();
 
   const guestShoppingBag = !sessionStorage.getItem("user");
 
@@ -108,6 +110,7 @@ export async function action({ request }) {
     body: JSON.stringify({ productId }),
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken,
     },
     credentials: "include",
   });

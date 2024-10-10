@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import { Form, redirect } from "react-router-dom";
+import { getCSRFToken } from "../context/auth";
 
 const productDefaultValue = {
   title: "",
@@ -168,6 +169,7 @@ export async function action({ request, params }) {
   const color = formData.get("color");
   const category = formData.get("category");
   const image = formData.get("image");
+  const csrfToken = await getCSRFToken();
 
   const productData = {
     title: title,
@@ -186,7 +188,7 @@ export async function action({ request, params }) {
 
   const product = await fetch(requestUrl, {
     method: request.method,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
     body: JSON.stringify(productData),
     credentials: "include",
   });

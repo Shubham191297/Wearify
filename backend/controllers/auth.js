@@ -1,5 +1,7 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const cookie = require("cookie");
+const { Op } = require("sequelize");
 
 exports.postLogin = (req, res) => {
   const { email, password } = req.body;
@@ -13,6 +15,15 @@ exports.postLogin = (req, res) => {
         if (doMatch) {
           req.session.username = user.name;
           req.session.userId = user.email;
+
+          const newCsrfToken = req.csrfToken();
+
+          res.setHeader(
+            "Set-Cookie",
+            cookie.serialize("_csrf", newCsrfToken, {
+              path: "/",
+            })
+          );
 
           res.status(200).send({
             message: "User logged in successfully!!",
@@ -36,6 +47,10 @@ exports.postLogout = (req, res) => {
       httpOnly: true,
       secure: false,
     });
+    res.clearCookie("_csrf", {
+      httpOnly: true,
+      secure: false,
+    });
     res.status(200).send({
       message: "User logged out successfully!!",
     });
@@ -45,12 +60,15 @@ exports.postLogout = (req, res) => {
 exports.postSignup = (req, res) => {
   const { username, email, password } = req.body;
 
-  User.findOne({ where: { email: email } })
+  User.findOne({ where: { [Op.or]: [{ email: email }, { name: username }] } })
     .then((user) => {
-      if (user) {
+      if (user.email === email) {
         return res
           .status(409)
           .send({ message: "User with this email already exists!" });
+      }
+      if (user.name === username) {
+        return res.status(409).send({ message: "Username already taken" });
       }
       return bcrypt
         .hash(password, 12)

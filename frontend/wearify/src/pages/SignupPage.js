@@ -1,5 +1,6 @@
 import React from "react";
 import { Form, redirect, useActionData } from "react-router-dom";
+import { getCSRFToken } from "../context/auth";
 
 const SignupPage = () => {
   const errors = useActionData();
@@ -14,8 +15,8 @@ const SignupPage = () => {
         </div>
 
         <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-          {errors?.message && (
-            <p className="text-sm text-red-600 mb-4">{errors.email}</p>
+          {errors && (
+            <p className="text-sm text-red-600 mb-4">{errors.message}</p>
           )}
           <Form className="space-y-6" method="POST">
             <div className="text-left">
@@ -119,6 +120,7 @@ export async function action({ request }) {
   const password = formData.get("password");
   const confirmpass = formData.get("confirmpass");
   const errors = {};
+  const csrfToken = await getCSRFToken();
 
   if (confirmpass !== password) {
     errors.message = "Entered passwords do not match!";
@@ -130,6 +132,7 @@ export async function action({ request }) {
     body: JSON.stringify({ username, email, password, confirmpass }),
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken,
     },
     credentials: "include",
   });

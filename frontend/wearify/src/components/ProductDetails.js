@@ -3,6 +3,7 @@ import { useRouteLoaderData, defer, Await } from "react-router-dom";
 import ProductOverview from "./ProductOverview";
 import CustomError from "../layouts/CustomError";
 import ErrorPage from "../pages/ErrorPage";
+import { getCSRFToken } from "../context/auth";
 
 const ProductDetails = () => {
   const { product } = useRouteLoaderData("product-detail");
@@ -19,7 +20,13 @@ const ProductDetails = () => {
 export default ProductDetails;
 
 async function loadProduct(id) {
-  const response = await fetch("http://localhost:5000/products/" + id);
+  const csrfToken = await getCSRFToken();
+  const response = await fetch("http://localhost:5000/products/" + id, {
+    credentials: "include",
+    headers: {
+      "X-CSRF-Token": csrfToken,
+    },
+  });
 
   const product = await response.json();
 

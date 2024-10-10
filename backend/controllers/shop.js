@@ -98,7 +98,7 @@ exports.deleteItemShoppingBag = (req, res) => {
     })
     .then((shoppingBag) => shoppingBag.deleteProductFromBag(product))
     .then((updatedBag) => {
-      res.status(204).send({
+      res.status(200).send({
         message: "Product deleted from bag successfully",
         updatedBag: updatedBag,
       });

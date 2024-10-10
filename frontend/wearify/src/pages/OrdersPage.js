@@ -3,6 +3,7 @@ import { Await, defer, useLoaderData } from "react-router-dom";
 import OrdersOverview from "../components/OrdersOverview";
 import CustomError from "../layouts/CustomError";
 import ErrorPage from "./ErrorPage";
+import { getCSRFToken } from "../context/auth";
 
 const OrdersPage = () => {
   const { orders } = useLoaderData();
@@ -21,8 +22,12 @@ const OrdersPage = () => {
 export default OrdersPage;
 
 async function loadOrders() {
+  const csrfToken = await getCSRFToken();
   const response = await fetch("http://localhost:5000/orders/", {
     credentials: "include",
+    headers: {
+      "X-CSRF-Token": csrfToken,
+    },
   });
   const orders = await response.json();
 

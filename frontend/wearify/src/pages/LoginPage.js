@@ -1,5 +1,6 @@
 import { Form, Link, redirect, useActionData } from "react-router-dom";
 import { mergeGuestShoppingBag } from "../guest/GuestBag";
+import { getCSRFToken } from "../context/auth";
 
 const LoginPage = () => {
   const errors = useActionData();
@@ -95,11 +96,13 @@ export async function action({ request }) {
   const formData = await request.formData();
   const email = formData.get("email");
   const pass = formData.get("password");
+  const csrfToken = await getCSRFToken();
 
   const userData = await fetch("http://localhost:5000/auth/login", {
     method: request.method,
     headers: {
       "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken,
     },
     credentials: "include",
     body: JSON.stringify({ email: email, password: pass }),

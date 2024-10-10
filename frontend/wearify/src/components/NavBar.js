@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Button, Disclosure } from "@headlessui/react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import AuthContext from "../context/auth";
+import AuthContext, { getCSRFToken } from "../context/auth";
 
 const navigation = [
   { name: "Home", href: "/", current: false },
@@ -109,12 +109,16 @@ const NavBar = () => {
                     "rounded-md px-3 py-2 text-sm font-medium"
                   )}
                   onClick={async () => {
+                    const csrfToken = await getCSRFToken();
                     const res = await fetch(
                       "http://localhost:5000/auth/logout",
                       {
                         method: "POST",
                         body: null,
                         credentials: "include",
+                        headers: {
+                          "X-CSRF-Token": csrfToken,
+                        },
                       }
                     );
                     await res.json();
