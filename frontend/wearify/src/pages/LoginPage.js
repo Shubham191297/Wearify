@@ -17,7 +17,7 @@ const LoginPage = () => {
         {errors?.message && (
           <p className="text-md text-red-600 mb-4">{errors.message}</p>
         )}
-        <Form className="space-y-6" method="POST">
+        <Form className="space-y-6" method="POST" noValidate>
           <div className="text-left">
             <label
               htmlFor="email"
@@ -47,7 +47,7 @@ const LoginPage = () => {
               </label>
               <div className="text-sm">
                 <Link
-                  href="#"
+                  to="/auth/reset-password"
                   className="font-semibold text-indigo-600 hover:text-indigo-500"
                 >
                   Forgot password?
@@ -112,6 +112,7 @@ export async function action({ request }) {
   const errors = {};
 
   const loginInfo = await userData.json();
+
   if (!userData.ok) {
     errors.message = loginInfo.message;
     return errors;

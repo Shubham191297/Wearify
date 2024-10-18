@@ -6,7 +6,7 @@ import {
   removeItemFromGuestBag,
 } from "../guest/GuestBag";
 import CustomError from "../layouts/CustomError";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "../layouts/ErrorPage";
 import { getCSRFToken } from "../context/auth";
 
 const ShoppingBagPage = () => {

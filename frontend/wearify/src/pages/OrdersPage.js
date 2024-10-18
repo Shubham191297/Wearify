@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Await, defer, useLoaderData } from "react-router-dom";
 import OrdersOverview from "../components/OrdersOverview";
 import CustomError from "../layouts/CustomError";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "../layouts/ErrorPage";
 import { getCSRFToken } from "../context/auth";
 
 const OrdersPage = () => {

@@ -18,7 +18,7 @@ const SignupPage = () => {
           {errors && (
             <p className="text-sm text-red-600 mb-4">{errors.message}</p>
           )}
-          <Form className="space-y-6" method="POST">
+          <Form className="space-y-6" method="POST" noValidate>
             <div className="text-left">
               <label
                 htmlFor="username"
@@ -33,7 +33,11 @@ const SignupPage = () => {
                   type="text"
                   autoComplete="text"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                    errors?.inputName === "username"
+                      ? "bg-red-200 ring-red-600"
+                      : "ring-gray-300"
+                  } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
                 />
               </div>
             </div>
@@ -51,7 +55,11 @@ const SignupPage = () => {
                   type="email"
                   autoComplete="email"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                    errors?.inputName === "email"
+                      ? "bg-red-200 ring-red-600"
+                      : "ring-gray-300"
+                  } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
                 />
               </div>
             </div>
@@ -69,7 +77,11 @@ const SignupPage = () => {
                   type="password"
                   autoComplete="password"
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                    errors?.inputName === "password"
+                      ? "bg-red-200 ring-red-600"
+                      : "ring-gray-300"
+                  } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
                 />
               </div>
             </div>
@@ -90,7 +102,11 @@ const SignupPage = () => {
                   type="password"
                   autoComplete=""
                   required
-                  className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                  className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                    errors?.inputName === "confirmpass"
+                      ? "bg-red-200 ring-red-600"
+                      : "ring-gray-300"
+                  } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
                 />
               </div>
             </div>
@@ -122,11 +138,6 @@ export async function action({ request }) {
   const errors = {};
   const csrfToken = await getCSRFToken();
 
-  if (confirmpass !== password) {
-    errors.message = "Entered passwords do not match!";
-    return errors;
-  }
-
   const res = await fetch("http://localhost:5000/auth/signup", {
     method: request.method,
     body: JSON.stringify({ username, email, password, confirmpass }),
@@ -141,6 +152,8 @@ export async function action({ request }) {
 
   if (!res.ok) {
     errors.message = signupInfo.message;
+    errors.inputName = signupInfo.inputName;
+
     return errors;
   }
 

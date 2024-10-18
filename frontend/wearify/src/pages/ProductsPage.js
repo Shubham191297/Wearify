@@ -9,7 +9,7 @@ import { Await, defer } from "react-router-dom";
 import { useLoaderData } from "react-router-dom";
 import ProductList from "../components/ProductList";
 import AuthContext, { getCSRFToken } from "../context/auth";
-import ErrorPage from "./ErrorPage";
+import ErrorPage from "../layouts/ErrorPage";
 import CustomError from "../layouts/CustomError";
 
 const ProductsPage = ({ adminPage = false }) => {

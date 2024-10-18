@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import ProductForm from "./ProductForm";
 import AuthContext from "../context/auth";
-import ErrorPage from "../pages/ErrorPage";
+import ErrorPage from "../layouts/ErrorPage";
 
 const AddProduct = () => {
   const authCtx = useContext(AuthContext);

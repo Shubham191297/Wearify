@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Form, redirect } from "react-router-dom";
+import { Form, redirect, useActionData } from "react-router-dom";
 import { getCSRFToken } from "../context/auth";
 
 const productDefaultValue = {
@@ -16,6 +16,7 @@ const ProductForm = ({ product, editMode }) => {
   const [productDetails, setProductDetails] = useState(
     product ? product : productDefaultValue
   );
+  const errors = useActionData();
 
   const inputChangeHandler = (e) => {
     const { name, value } = e.target;
@@ -31,131 +32,166 @@ const ProductForm = ({ product, editMode }) => {
   // };
 
   return (
-    <Form method={editMode ? "PUT" : "POST"} className="space-y-6">
-      <div>
-        <label
-          htmlFor="title"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Title
-        </label>
-        <div className="mt-2">
-          <input
-            id="title"
-            name="title"
-            type="text"
-            required
-            onChange={inputChangeHandler}
-            value={productDetails.title}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          />
+    <div>
+      {errors?.message && (
+        <p className="text-md text-red-600 mb-4">{errors.message}</p>
+      )}
+      <Form
+        method={editMode ? "PUT" : "POST"}
+        className="space-y-6"
+        encType="multipart/form-data"
+        noValidate
+      >
+        <div>
+          <label
+            htmlFor="title"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Title
+          </label>
+          <div className="mt-2">
+            <input
+              id="title"
+              name="title"
+              type="text"
+              required
+              onChange={inputChangeHandler}
+              value={productDetails.title}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                errors?.inputName === "title"
+                  ? "bg-red-200 ring-red-600"
+                  : "ring-gray-300"
+              } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <label
-          htmlFor="description"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Description
-        </label>
-        <div className="mt-2">
-          <textarea
-            id="description"
-            name="description"
-            type="text"
-            required
-            onChange={inputChangeHandler}
-            value={productDetails.description}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          />
+        <div>
+          <label
+            htmlFor="description"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Description
+          </label>
+          <div className="mt-2">
+            <textarea
+              id="description"
+              name="description"
+              type="text"
+              required
+              onChange={inputChangeHandler}
+              value={productDetails.description}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                errors?.inputName === "description"
+                  ? "bg-red-200 ring-red-600"
+                  : "ring-gray-300"
+              } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <label
-          htmlFor="category"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Category
-        </label>
-        <div className="mt-2">
-          <input
-            id="category"
-            name="category"
-            type="text"
-            required
-            onChange={inputChangeHandler}
-            value={productDetails.category}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          />
+        <div>
+          <label
+            htmlFor="category"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Category
+          </label>
+          <div className="mt-2">
+            <input
+              id="category"
+              name="category"
+              type="text"
+              required
+              onChange={inputChangeHandler}
+              value={productDetails.category}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                errors?.inputName === "category"
+                  ? "bg-red-200 ring-red-600"
+                  : "ring-gray-300"
+              } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <label
-          htmlFor="color"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Color
-        </label>
-        <div className="mt-2">
-          <input
-            id="color"
-            name="color"
-            type="text"
-            required
-            onChange={inputChangeHandler}
-            value={productDetails.color}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          />
+        <div>
+          <label
+            htmlFor="color"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Color
+          </label>
+          <div className="mt-2">
+            <input
+              id="color"
+              name="color"
+              type="text"
+              required
+              onChange={inputChangeHandler}
+              value={productDetails.color}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                errors?.inputName === "color"
+                  ? "bg-red-200 ring-red-600"
+                  : "ring-gray-300"
+              } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <label
-          htmlFor="price"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Price
-        </label>
-        <div className="mt-2">
-          <input
-            id="price"
-            name="price"
-            type="number"
-            required
-            onChange={inputChangeHandler}
-            value={productDetails.price}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          />
+        <div>
+          <label
+            htmlFor="price"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Price
+          </label>
+          <div className="mt-2">
+            <input
+              id="price"
+              name="price"
+              type="number"
+              required
+              onChange={inputChangeHandler}
+              value={productDetails.price}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                errors?.inputName === "price"
+                  ? "bg-red-200 ring-red-600"
+                  : "ring-gray-300"
+              } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+            />
+          </div>
         </div>
-      </div>
-      <div>
-        <label
-          htmlFor="image"
-          className="block text-sm font-medium leading-6 text-gray-900"
-        >
-          Image
-        </label>
-        <div className="mt-2">
-          <input
-            id="image"
-            name="image"
-            type="text"
-            required
-            onChange={inputChangeHandler}
-            value={productDetails.image}
-            className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-          />
+        <div>
+          <label
+            htmlFor="image"
+            className="block text-sm font-medium leading-6 text-gray-900"
+          >
+            Image
+          </label>
+          <div className="mt-2">
+            <input
+              id="image"
+              name="image"
+              type="file"
+              accept="image/*"
+              required
+              // value={productDetails.image}
+              // className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+              //   errors?.inputName === "image"
+              //     ? "bg-red-200 ring-red-600"
+              //     : "ring-gray-300"
+              // } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 ring-gray-300 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+            />
+          </div>
         </div>
-      </div>
 
-      <div>
-        <button
-          type="submit"
-          className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-        >
-          {editMode ? "Update " : "Add "} product
-        </button>
-      </div>
-    </Form>
+        <div>
+          <button
+            type="submit"
+            className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          >
+            {editMode ? "Update " : "Add "} product
+          </button>
+        </div>
+      </Form>
+    </div>
   );
 };
 
@@ -163,22 +199,14 @@ export default ProductForm;
 
 export async function action({ request, params }) {
   const formData = await request.formData();
-  const title = formData.get("title");
-  const description = formData.get("description");
-  const price = formData.get("price");
-  const color = formData.get("color");
-  const category = formData.get("category");
-  const image = formData.get("image");
+  // const title = formData.get("title");
+  // const description = formData.get("description");
+  // const price = formData.get("price");
+  // const color = formData.get("color");
+  // const category = formData.get("category");
+  // const image = formData.get("image");
   const csrfToken = await getCSRFToken();
-
-  const productData = {
-    title: title,
-    description: description,
-    color: color,
-    category: category,
-    price: price,
-    image: image,
-  };
+  const errors = {};
 
   const requestUrl =
     "http://localhost:5000/admin/" +
@@ -186,13 +214,22 @@ export async function action({ request, params }) {
       ? "add-product"
       : `edit-product/${params.productId}`);
 
-  const product = await fetch(requestUrl, {
+  const resData = await fetch(requestUrl, {
     method: request.method,
-    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
-    body: JSON.stringify(productData),
+    headers: { "X-CSRF-Token": csrfToken },
+    body: formData,
     credentials: "include",
   });
-  await product.json();
 
-  return redirect("/admin/products");
+  const product = await resData.json();
+
+  if (!resData.ok) {
+    errors.message = product.message;
+    errors.inputName = product.inputName;
+    return errors;
+  }
+
+  console.log(product);
+  return null;
+  // return redirect("/admin/products");
 }

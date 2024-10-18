@@ -1,4 +1,4 @@
-const { Sequelize } = require("sequelize");
+const { Sequelize, STRING } = require("sequelize");
 const sequelize = require("../utils/pgsql-database");
 
 const User = sequelize.define("user", {
@@ -10,6 +10,12 @@ const User = sequelize.define("user", {
   },
   name: Sequelize.STRING,
   email: Sequelize.STRING,
+  resetToken: {
+    type: Sequelize.STRING,
+  },
+  resetTokenExpiration: {
+    type: Sequelize.DATE,
+  },
   shoppingBagId: {
     type: Sequelize.STRING,
   },

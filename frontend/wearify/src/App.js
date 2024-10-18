@@ -21,9 +21,13 @@ import { loader as ordersLoader } from "./pages/OrdersPage";
 import { action as productListActions } from "./components/ProductList";
 import { action as productActions } from "./components/ProductForm";
 import LoginPage, { action as loginActions } from "./pages/LoginPage";
-import ErrorPage from "./pages/ErrorPage";
+import ErrorPage from "./layouts/ErrorPage";
 import OrdersPage from "./pages/OrdersPage";
 import SignupPage, { action as signupActions } from "./pages/SignupPage";
+import ResetPage, { action as resetPasswordActions } from "./layouts/ResetPage";
+import ChangePassword, {
+  action as changePasswordAction,
+} from "./layouts/ChangePassword";
 
 const router = createBrowserRouter([
   {
@@ -78,7 +82,7 @@ const router = createBrowserRouter([
         path: "products",
         loader: adminProductsLoader,
         action: productListActions,
-        element: <ProductsPage isAdmin={true} key="admin-products" />,
+        element: <ProductsPage adminPage={true} key="admin-products" />,
       },
       { path: "add-product", element: <AddProduct />, action: productActions },
       {
@@ -97,6 +101,22 @@ const router = createBrowserRouter([
             description="Sorry, we couldn’t find the page you’re looking for."
           />
         ),
+      },
+    ],
+  },
+  {
+    path: "/auth",
+    element: <RootLayout />,
+    children: [
+      {
+        path: "reset-password",
+        element: <ResetPage />,
+        action: resetPasswordActions,
+      },
+      {
+        path: "reset/:resetToken",
+        element: <ChangePassword />,
+        action: changePasswordAction,
       },
     ],
   },

@@ -5,12 +5,34 @@ const psSequelize = require("./utils/pgsql-database");
 const mongoose = require("mongoose");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
+const multer = require("multer");
 
 const User = require("./models/user");
 const ShoppingBag = require("./models/bag");
 const sessionData = require("./utils/session-db");
 
 const app = express();
+
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images");
+  },
+  filename: (req, file, cb) => {
+    cb(null, "wearify-" + file.originalname);
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg"
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
 
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
@@ -26,6 +48,10 @@ app.use(
 app.use(express.json());
 app.use(sessionData);
 app.use(cookieParser());
+
+app.use(
+  multer({ storage: fileStorage, fileFilter: fileFilter }).single("image")
+);
 
 const csrfToken = csrf({ cookie: true });
 app.use(csrfToken);

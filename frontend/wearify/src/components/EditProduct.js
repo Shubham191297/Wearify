@@ -1,7 +1,7 @@
 import React, { Suspense } from "react";
 import { defer, Await, useRouteLoaderData } from "react-router-dom";
 import ProductForm from "./ProductForm";
-import ErrorPage from "../pages/ErrorPage";
+import ErrorPage from "../layouts/ErrorPage";
 import CustomError from "../layouts/CustomError";
 
 const EditProduct = ({ editMode }) => {
