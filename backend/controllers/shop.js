@@ -1,3 +1,5 @@
+const fs = require("fs");
+const path = require("path");
 const ShoppingBag = require("../models/bag.js");
 const Order = require("../models/order.js");
 const Product = require("../models/product.js");
@@ -173,4 +175,31 @@ exports.mergeGuestShoppingBagData = (req, res) => {
     .catch((err) =>
       res.status(500).send({ message: "Unable to generate shopping bag!!" })
     );
+};
+
+exports.getInvoice = (req, res) => {
+  const orderId = req.params.orderId;
+
+  Order.findById(orderId)
+    .then((order) => {
+      if (!order) {
+        return res.status(404).send({ message: "Order not found" });
+      }
+      if(order.user.id===req.user)
+    })
+    .catch((err) => console.log(err));
+
+  const invoiceName = "invoices-" + orderId + ".pdf";
+  const invoicePath = path.join("data", "invoices", invoiceName);
+  fs.readFile(invoicePath, (err, data) => {
+    if (err) {
+      return next(err);
+    }
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename="${invoiceName}"`
+    );
+    res.send(data);
+  });
 };
