@@ -21,11 +21,12 @@
     "cookie": "^1.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "csurf": "^1.11.0",
+    "csurf": "^1.2.2",
     "express": "^4.19.2",
     "express-session": "^1.18.0",
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
+    "pdfkit": "^0.15.0",
     "pg-hstore": "^2.3.4",
     "pg-promise": "^11.9.1",
     "sequelize": "^6.37.3"

@@ -1,5 +1,8 @@
 import React from "react";
 import NoOrders from "../pages/NoOrders";
+import { imagePath } from "../utils/imagePath";
+import { Form } from "react-router-dom";
+import { getCSRFToken } from "../context/auth";
 
 const OrdersOverview = ({ orders }) => {
   const noOrders = orders.length === 0;
@@ -25,7 +28,7 @@ const OrdersOverview = ({ orders }) => {
                       <div className="flex min-w-0 gap-x-4">
                         <img
                           className="h-12 w-12 flex-none rounded-full bg-gray-50"
-                          src={product.image}
+                          src={`${imagePath}${product.image}`}
                           alt=""
                         />
                         <div className="min-w-0 flex-auto">
@@ -55,10 +58,18 @@ const OrdersOverview = ({ orders }) => {
                       Rs. {order.cost}
                     </p>
                   </div>
-                  <p className="mt-1 text-sm leading-5 text-gray-800 text-right p-4">
-                    Placed at{" "}
-                    <time dateTime="2023-01-23T13:23Z">{order.placedAt}</time>
-                  </p>
+                  <div className="flex w-full">
+                    <p className="mt-1 text-sm leading-5 p-4 w-1/5">
+                      <Form method="POST">
+                        <input type="hidden" name="orderId" value={order._id} />
+                        <button type="submit">Download</button>
+                      </Form>
+                    </p>
+                    <p className="mt-1 text-sm leading-5 text-gray-800 text-right p-4 w-full">
+                      Placed at{" "}
+                      <time dateTime="2023-01-23T13:23Z">{order.placedAt}</time>
+                    </p>
+                  </div>
                 </ul>
               </li>
             ))}
@@ -70,3 +81,29 @@ const OrdersOverview = ({ orders }) => {
 };
 
 export default OrdersOverview;
+
+export async function action({ request }) {
+  const formData = await request.formData();
+  const orderId = formData.get("orderId");
+  const csrfToken = await getCSRFToken();
+
+  const resData = await fetch("http://localhost:5000/orders/" + orderId, {
+    credentials: "include",
+    headers: {
+      "X-CSRF-Token": csrfToken,
+    },
+  });
+
+  const orderData = await resData.blob();
+
+  const orderURL = window.URL.createObjectURL(orderData);
+  const a = document.createElement("a");
+  a.href = orderURL;
+  a.download = `order_${orderId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(orderURL);
+
+  return null;
+}

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { imagePath } from "../utils/imagePath";
 
 const ProductOverview = ({ product }) => {
   return (
@@ -41,14 +42,14 @@ const ProductOverview = ({ product }) => {
           <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
             <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
               <img
-                src={product.image}
+                src={`${imagePath}${product.image}`}
                 alt="Model wearing plain black basic tee."
                 className="h-full w-full object-cover object-center"
               ></img>
             </div>
             <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
               <img
-                src={product.image}
+                src={`${imagePath}${product.image}`}
                 alt="Model wearing plain gray basic tee."
                 className="h-full w-full object-cover object-center"
               ></img>
@@ -56,7 +57,7 @@ const ProductOverview = ({ product }) => {
           </div>
           <div className="aspect-h-5 aspect-w-4 lg:aspect-h-4 lg:aspect-w-3 sm:overflow-hidden sm:rounded-lg">
             <img
-              src={product.image}
+              src={`${imagePath}${product.image}`}
               alt="Model wearing plain white basic tee."
               className="h-full w-full object-cover object-center"
             ></img>

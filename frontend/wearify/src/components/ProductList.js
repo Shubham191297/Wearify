@@ -5,6 +5,7 @@ import BagIcon from "../icons/BagIcon";
 import { Form, Link, redirect } from "react-router-dom";
 import { addItemToGuestBag } from "../guest/GuestBag";
 import { getCSRFToken } from "../context/auth";
+import { imagePath } from "../utils/imagePath";
 
 const ProductItem = ({ adminPage, products }) => {
   return (
@@ -14,7 +15,7 @@ const ProductItem = ({ adminPage, products }) => {
           <div className="group relative" key={product._id}>
             <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
               <img
-                src={product.image}
+                src={`${imagePath}${product.image}`}
                 alt="Front of men&#039;s Basic Tee in black."
                 className="h-full w-full object-cover object-center lg:h-full lg:w-full"
               ></img>

@@ -9,7 +9,7 @@ const ShoppingBagItems = ({ shoppingBagItems }) => {
           <li className="flex py-6" key={item.productData._id}>
             <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
               <img
-                src={item.productData.image}
+                src={`http://localhost:5000/${item.productData.image}`}
                 alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
                 className="h-full w-full object-cover object-center"
               />

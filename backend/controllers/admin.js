@@ -4,25 +4,31 @@ const { validationResult } = require("express-validator");
 
 exports.addProduct = (req, res) => {
   const { title, description, category, color, price } = req.body;
-  const imagePath = req.file.path;
-
-  const product = new Product({
-    title: title,
-    description: description,
-    category: category,
-    color: color,
-    price: price,
-    image: imagePath,
-  });
+  const imagePath = req.file?.path;
+  console.log(imagePath);
 
   const result = validationResult(req);
 
-  if (result.errors.length > 0) {
+  if (!imagePath) {
+    res.status(400).send({
+      message: "Either no image is provided or provided file is not a image",
+      inputName: "image",
+    });
+  } else if (result.errors.length > 0) {
     res.status(400).send({
       message: result.errors[0].msg,
       inputName: result.errors[0].path,
     });
   } else {
+    const product = new Product({
+      title: title,
+      description: description,
+      category: category,
+      color: color,
+      price: price,
+      image: imagePath,
+    });
+
     product
       .save()
       .then((result) => {
@@ -61,9 +67,11 @@ exports.getProduct = (req, res) => {
 };
 
 exports.editProduct = (req, res) => {
-  const { title, description, category, color, price, image } = req.body;
+  const { title, description, category, color, price } = req.body;
+  const imagePath = req.file?.path;
 
   const result = validationResult(req);
+
   if (result.errors.length > 0) {
     console.log(result.errors);
     res.status(400).send({
@@ -78,7 +86,9 @@ exports.editProduct = (req, res) => {
         product.category = category;
         product.color = color;
         product.price = price;
-        product.image = image;
+        if (imagePath) {
+          product.image = imagePath;
+        }
 
         return product.save();
       })

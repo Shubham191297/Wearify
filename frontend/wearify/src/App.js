@@ -20,6 +20,7 @@ import ShoppingBagPage, {
 import { loader as ordersLoader } from "./pages/OrdersPage";
 import { action as productListActions } from "./components/ProductList";
 import { action as productActions } from "./components/ProductForm";
+import { action as orderActions } from "./components/OrdersOverview";
 import LoginPage, { action as loginActions } from "./pages/LoginPage";
 import ErrorPage from "./layouts/ErrorPage";
 import OrdersPage from "./pages/OrdersPage";
@@ -58,7 +59,12 @@ const router = createBrowserRouter([
         action: shoppingBagActions,
         element: <ShoppingBagPage />,
       },
-      { path: "orders", loader: ordersLoader, element: <OrdersPage /> },
+      {
+        path: "orders",
+        loader: ordersLoader,
+        action: orderActions,
+        element: <OrdersPage />,
+      },
       { path: "login", action: loginActions, element: <LoginPage /> },
       { path: "signup", action: signupActions, element: <SignupPage /> },
       {

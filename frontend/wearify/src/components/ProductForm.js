@@ -26,10 +26,14 @@ const ProductForm = ({ product, editMode }) => {
     }));
   };
 
-  // const submitHandler = (e) => {
-  //   e.preventDefault();
-  //   setProductDetails(productDefaultValue);
-  // };
+  const fileChangeHandler = (event) => {
+    const value = event.target.files[0];
+    const { name } = event.target;
+    setProductDetails((prevStateDetails) => ({
+      ...prevStateDetails,
+      [name]: value,
+    }));
+  };
 
   return (
     <div>
@@ -171,13 +175,13 @@ const ProductForm = ({ product, editMode }) => {
               type="file"
               accept="image/*"
               required
-              // value={productDetails.image}
-              // className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
-              //   errors?.inputName === "image"
-              //     ? "bg-red-200 ring-red-600"
-              //     : "ring-gray-300"
-              // } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
-              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 ring-gray-300 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+              onChange={fileChangeHandler}
+              className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset  placeholder:text-gray-400 ${
+                errors?.inputName === "image"
+                  ? "bg-red-200 ring-red-600"
+                  : "ring-gray-300"
+              } focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
+              // className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset placeholder:text-gray-400 ring-gray-300 focus:ring-2 focus:ring-inset sm:text-sm sm:leading-6`}
             />
           </div>
         </div>
@@ -199,12 +203,7 @@ export default ProductForm;
 
 export async function action({ request, params }) {
   const formData = await request.formData();
-  // const title = formData.get("title");
-  // const description = formData.get("description");
-  // const price = formData.get("price");
-  // const color = formData.get("color");
-  // const category = formData.get("category");
-  // const image = formData.get("image");
+
   const csrfToken = await getCSRFToken();
   const errors = {};
 
@@ -230,6 +229,6 @@ export async function action({ request, params }) {
   }
 
   console.log(product);
-  return null;
-  // return redirect("/admin/products");
+
+  return redirect("/admin/products");
 }

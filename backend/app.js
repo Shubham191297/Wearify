@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const psSequelize = require("./utils/pgsql-database");
 const mongoose = require("mongoose");
+const path = require("path");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
@@ -47,6 +48,9 @@ app.use(
 );
 app.use(express.json());
 app.use(sessionData);
+app.use("/images", express.static(path.join(__dirname, "images")));
+console.log(__dirname);
+
 app.use(cookieParser());
 
 app.use(
