@@ -49,7 +49,6 @@ app.use(
 app.use(express.json());
 app.use(sessionData);
 app.use("/images", express.static(path.join(__dirname, "images")));
-console.log(__dirname);
 
 app.use(cookieParser());
 

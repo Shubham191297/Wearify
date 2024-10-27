@@ -1,11 +1,11 @@
 const Product = require("../models/product.js");
 const ShoppingBag = require("../models/bag.js");
 const { validationResult } = require("express-validator");
+const fileHelper = require("../utils/file.js");
 
 exports.addProduct = (req, res) => {
   const { title, description, category, color, price } = req.body;
   const imagePath = req.file?.path;
-  console.log(imagePath);
 
   const result = validationResult(req);
 
@@ -87,6 +87,7 @@ exports.editProduct = (req, res) => {
         product.color = color;
         product.price = price;
         if (imagePath) {
+          fileHelper.deleteFile(product.image);
           product.image = imagePath;
         }
 
@@ -108,14 +109,18 @@ exports.deleteProduct = (req, res) => {
   const productId = req.body.productId;
 
   Product.findById(productId)
-    .then((product) => ShoppingBag.deleteProduct(productId, product.price))
-    .then(() => Product.findByIdAndDelete(productId))
-    .then((result) => {
-      console.log("Deleted product successfully!");
-      res
-        .status(200)
-        .send({ message: "Product was deleted!", deletedProduct: result });
+    .then((product) => {
+      fileHelper.deleteFile(product.image);
+      return ShoppingBag.deleteProduct(productId, product.price);
     })
+    .then(() =>
+      Product.deleteOne({ _id: productId }).then((result) => {
+        console.log("Deleted product successfully!");
+        res
+          .status(200)
+          .send({ message: "Product was deleted!", deletedProduct: result });
+      })
+    )
     .catch((err) =>
       res.status(500).send({ message: "Unable to delete product" })
     );

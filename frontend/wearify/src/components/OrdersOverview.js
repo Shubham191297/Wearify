@@ -59,12 +59,12 @@ const OrdersOverview = ({ orders }) => {
                     </p>
                   </div>
                   <div className="flex w-full">
-                    <p className="mt-1 text-sm leading-5 p-4 w-1/5">
+                    <span className="mt-1 text-sm leading-5 p-4 w-1/5">
                       <Form method="POST">
                         <input type="hidden" name="orderId" value={order._id} />
                         <button type="submit">Download</button>
                       </Form>
-                    </p>
+                    </span>
                     <p className="mt-1 text-sm leading-5 text-gray-800 text-right p-4 w-full">
                       Placed at{" "}
                       <time dateTime="2023-01-23T13:23Z">{order.placedAt}</time>
