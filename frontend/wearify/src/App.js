@@ -29,6 +29,7 @@ import ResetPage, { action as resetPasswordActions } from "./layouts/ResetPage";
 import ChangePassword, {
   action as changePasswordAction,
 } from "./layouts/ChangePassword";
+import CheckoutPage from "./pages/CheckoutPage";
 
 const router = createBrowserRouter([
   {
@@ -64,6 +65,10 @@ const router = createBrowserRouter([
         loader: ordersLoader,
         action: orderActions,
         element: <OrdersPage />,
+      },
+      {
+        path: "checkout",
+        element: <CheckoutPage />,
       },
       { path: "login", action: loginActions, element: <LoginPage /> },
       { path: "signup", action: signupActions, element: <SignupPage /> },
