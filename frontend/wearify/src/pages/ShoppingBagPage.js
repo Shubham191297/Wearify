@@ -79,15 +79,18 @@ export async function action({ request }) {
 
   const url =
     "http://localhost:5000/" +
-    (deleteItemAction ? "shoppingBagItem" : "orders");
+    (deleteItemAction ? "shoppingBagItem" : "checkout");
 
   const bodyData = deleteItemAction
     ? { productId: formData.get("productId") }
-    : { shoppingBagId: formData.get("bagId") };
+    : null;
 
   const resData = await fetch(url, {
     method: request.method,
-    headers: { "Content-Type": "application/json", "X-CSRF-Token": csrfToken },
+    headers: {
+      "X-CSRF-Token": csrfToken,
+      "Content-Type": deleteItemAction ? "application/json" : "",
+    },
     body: JSON.stringify(bodyData),
     credentials: "include",
   });
@@ -98,5 +101,9 @@ export async function action({ request }) {
     throw new CustomError(resData.statusText, data.message, resData.status);
   }
 
-  return redirect(deleteItemAction ? "/shoppingBag" : "/orders");
+  if (!deleteItemAction) {
+    window.location.href = data.url;
+  }
+
+  return deleteItemAction ? redirect("/shoppingBag") : null;
 }

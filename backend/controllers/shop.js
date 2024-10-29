@@ -115,35 +115,59 @@ exports.deleteItemShoppingBag = (req, res) => {
 };
 
 exports.postOrder = (req, res) => {
-  const bagId = req.body.shoppingBagId;
-  let bagProducts;
-  let bagTotalPrice;
+  const bagId = req.user.shoppingBagId;
+  let orderProducts = [],
+    bagProducts;
+  let orderTotalPrice;
 
   ShoppingBag.findById(bagId)
     .then((bag) => {
+      orderTotalPrice = bag.totalPrice;
       bagProducts = bag.products;
-      bagTotalPrice = bag.totalPrice;
+      return Product.find()
+        .then((products) => {
+          for (product of products) {
+            const orderProductData = bag.products.find(
+              (prod) => prod.id === product._id.toString()
+            );
 
-      return bag.cleanBag();
-    })
-    .then(() => {
-      const userData = {
-        id: req.user.id,
-        name: req.user.name,
-        email: req.user.email,
-      };
+            if (orderProductData) {
+              orderProducts.push({
+                productData: product,
+                quantity: orderProductData.quantity,
+              });
+            }
+          }
 
-      const order = new Order({
-        products: bagProducts,
-        cost: bagTotalPrice,
-        user: userData,
-        placedAt: new Date(),
-      });
+          return bag.cleanBag().then(() => {
+            const userData = {
+              id: req.user.id,
+              name: req.user.name,
+              email: req.user.email,
+            };
+            console.log("I am here");
 
-      return order.save();
-    })
-    .then(() => {
-      res.status(201).send({ message: "Order created" });
+            const order = new Order({
+              products: bagProducts,
+              cost: orderTotalPrice,
+              user: userData,
+              placedAt: new Date(),
+            });
+            console.log(order);
+
+            return order.save().then((order) => {
+              res.status(201).send({
+                message: "Order created",
+                id: order._id.toString(),
+                items: orderProducts,
+                totalPrice: order.cost,
+              });
+            });
+          });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     })
     .catch((err) =>
       res.status(500).send({ message: "Unable to place order!" })
@@ -183,6 +207,7 @@ exports.mergeGuestShoppingBagData = (req, res) => {
 
 exports.postCheckout = (req, res) => {
   const shoppingBagId = req.user.shoppingBagId;
+
   let products;
   let totalPrice;
 
@@ -248,7 +273,11 @@ exports.postCheckout = (req, res) => {
         url: session.url,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) =>
+      res
+        .status(400)
+        .send({ message: `${err.message}. Unable to checkout at the moment` })
+    );
 };
 
 exports.getInvoice = (req, res) => {
