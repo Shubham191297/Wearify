@@ -29,7 +29,8 @@ import ResetPage, { action as resetPasswordActions } from "./layouts/ResetPage";
 import ChangePassword, {
   action as changePasswordAction,
 } from "./layouts/ChangePassword";
-import CheckoutPage from "./pages/CheckoutPage";
+import CheckoutPage, { loader as checkoutLoader } from "./pages/CheckoutPage";
+import CheckoutSuccess from "./layouts/CheckoutSuccess";
 
 const router = createBrowserRouter([
   {
@@ -68,7 +69,12 @@ const router = createBrowserRouter([
       },
       {
         path: "checkout",
+        // loader: checkoutLoader,
         element: <CheckoutPage />,
+      },
+      {
+        path: "checkout-success",
+        element: <CheckoutSuccess />,
       },
       { path: "login", action: loginActions, element: <LoginPage /> },
       { path: "signup", action: signupActions, element: <SignupPage /> },

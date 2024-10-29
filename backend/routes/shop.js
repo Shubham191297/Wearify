@@ -13,6 +13,8 @@ router.post("/shoppingBag", shopController.postShoppingBag);
 router.delete("/shoppingBagItem", shopController.deleteItemShoppingBag);
 router.put("/shoppingBag", shopController.mergeGuestShoppingBagData);
 
+router.post("/checkout", isAuth, shopController.postCheckout);
+
 router.post("/orders", isAuth, shopController.postOrder);
 router.get("/orders", isAuth, shopController.getOrders);
 router.get("/orders/:orderId", isAuth, shopController.getInvoice);

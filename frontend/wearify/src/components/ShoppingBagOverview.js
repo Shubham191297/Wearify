@@ -2,6 +2,7 @@ import React from "react";
 import { Link, Form } from "react-router-dom";
 import NoProductsBag from "../pages/NoProductsBag";
 import ShoppingBagItems from "./ShoppingBagItems";
+import { getCSRFToken } from "../context/auth";
 
 const ShoppingBagOverview = ({ shoppingBag }) => {
   const shoppingBagEmpty = !shoppingBag || shoppingBag?.items.length === 0;
@@ -32,7 +33,24 @@ const ShoppingBagOverview = ({ shoppingBag }) => {
                 <p>Rs. {shoppingBag.totalPrice}</p>
               </div>
               <div className="mt-6 flex-1 ">
-                <Form method="POST">
+                <Form
+                  // method="POST"
+                  onSubmit={async () => {
+                    const csrfToken = await getCSRFToken();
+                    const resData = await fetch(
+                      "http://localhost:5000/checkout",
+                      {
+                        method: "POST",
+                        credentials: "include",
+                        headers: {
+                          "X-CSRF-Token": csrfToken,
+                        },
+                      }
+                    );
+                    const sessionData = await resData.json();
+                    window.location.href = sessionData.url;
+                  }}
+                >
                   <input type="hidden" name="bagId" value={shoppingBag.id} />
                   <button
                     className="flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-2 py-3 mx-40 w-3/4 text-base font-medium text-white shadow-sm hover:bg-indigo-700"

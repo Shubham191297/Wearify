@@ -4,6 +4,9 @@ const ShoppingBag = require("../models/bag.js");
 const Order = require("../models/order.js");
 const Product = require("../models/product.js");
 const pdfGenerator = require("../data/pdfGenerator.js");
+const stripe = require("stripe")(
+  "sk_test_51MM08RSARoTdkEyg0BxRBlmAb8jsdpzebSepcdV7f6IeMpcdSMZ2t2HFZKLDspp0t4bGbN5aodGzpE9r7Y0A6pmu006ZMOpoQR"
+);
 
 exports.getProducts = (req, res) => {
   Product.find()
@@ -176,6 +179,76 @@ exports.mergeGuestShoppingBagData = (req, res) => {
     .catch((err) =>
       res.status(500).send({ message: "Unable to generate shopping bag!!" })
     );
+};
+
+exports.postCheckout = (req, res) => {
+  const shoppingBagId = req.user.shoppingBagId;
+  let products;
+  let totalPrice;
+
+  ShoppingBag.findById(shoppingBagId)
+    .then((bag) => {
+      totalPrice = bag.totalPrice;
+
+      const productItemsPromises = bag.products.map((prod) => {
+        return Product.findById(prod.id).then((item) => ({
+          id: prod.id,
+          name: item.title,
+          description: item.description,
+          quantity: prod.quantity,
+          price: item.price,
+          image: item.image,
+        }));
+      });
+
+      return Promise.all(productItemsPromises).then((items) => {
+        products = items;
+
+        return stripe.customers
+          .create({
+            name: "Shubham Thapliyal",
+            address: {
+              line1: "99 Pratham Paradise",
+              city: "Vadodara",
+              state: "Gujarat",
+              postal_code: "390009",
+              country: "IN",
+            },
+          })
+          .then((customer) =>
+            stripe.checkout.sessions.create({
+              payment_method_types: ["card"],
+              line_items: products.map((p) => {
+                return {
+                  price_data: {
+                    currency: "inr",
+                    product_data: {
+                      name: p.name,
+                      description: p.description,
+                    },
+                    unit_amount: p.price * 100,
+                  },
+                  quantity: p.quantity,
+                };
+              }),
+              mode: "payment",
+              success_url: "http://localhost:3000/checkout-success",
+              cancel_url: "http://localhost:3000/shoppingBag",
+              customer: customer.id,
+            })
+          );
+      });
+    })
+    .then((session) => {
+      res.status(200).send({
+        message: "Payment session created for user!",
+        sessionId: session.id,
+        totalSum: totalPrice,
+        products: products,
+        url: session.url,
+      });
+    })
+    .catch((err) => console.log(err));
 };
 
 exports.getInvoice = (req, res) => {
