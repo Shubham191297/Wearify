@@ -40,7 +40,7 @@ const ProductOverview = ({ product }) => {
 
         <div className="mx-auto mt-6 max-w-2xl sm:px-6 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
           <div className="hidden lg:grid lg:grid-cols-1 lg:gap-y-8">
-            <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg">
+            <div className="aspect-h-2 aspect-w-3 overflow-hidden rounded-lg bg-blue-200">
               <img
                 src={`${imagePath}${product.image}`}
                 alt="Model wearing plain black basic tee."
