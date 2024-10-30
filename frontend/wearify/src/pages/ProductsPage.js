@@ -6,7 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Await, defer } from "react-router-dom";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useLocation } from "react-router-dom";
 import ProductList from "../components/ProductList";
 import AuthContext, { getCSRFToken } from "../context/auth";
 import ErrorPage from "../layouts/ErrorPage";
@@ -16,6 +16,10 @@ const ProductsPage = ({ adminPage = false }) => {
   const { products } = useLoaderData();
   const authCtx = useContext(AuthContext);
   const [hasLoggedIn, setHasLoggedIn] = useState(false);
+  const location = useLocation();
+  const urlParams = new URLSearchParams(location.search);
+  const page = parseInt(urlParams.get("page")) || 1; // Default to page 1
+  // console.log(page);
 
   const loginUser = useCallback(
     (username, roleAdmin) => {
@@ -42,7 +46,12 @@ const ProductsPage = ({ adminPage = false }) => {
               <h2 className="text-2xl font-bold tracking-tight text-gray-900">
                 Trends for this year
               </h2>
-              <ProductList products={loadProducts} adminPage={adminPage} />
+              <ProductList
+                products={loadProducts.productsData}
+                adminPage={adminPage}
+                pageNumber={+page}
+                lastPage={loadProducts.lastPage}
+              />
             </div>
           )}
         </Await>
@@ -53,11 +62,15 @@ const ProductsPage = ({ adminPage = false }) => {
 
 export default ProductsPage;
 
-async function loadProducts(isAdmin) {
+async function loadProducts(isAdmin, { request }) {
   const csrfToken = await getCSRFToken();
+  const url = new URL(request.url);
+  const page = url.searchParams.get("page") || 1;
 
   const response = await fetch(
-    "http://localhost:5000/" + (isAdmin ? "admin/products/" : "products/"),
+    "http://localhost:5000/" +
+      (isAdmin ? "admin/products/" : "products/") +
+      `?page=${page}`,
     {
       credentials: "include",
       headers: {
@@ -77,12 +90,13 @@ async function loadProducts(isAdmin) {
   }
 
   sessionStorage.setItem("products", JSON.stringify(products));
+
   return products;
 }
 
-export function loader() {
+export function loader({ request }) {
   return defer({
-    products: loadProducts(""),
+    products: loadProducts("", { request }),
   });
 }
 

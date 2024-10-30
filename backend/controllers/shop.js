@@ -7,17 +7,28 @@ const pdfGenerator = require("../data/pdfGenerator.js");
 const stripe = require("stripe")(
   "sk_test_51MM08RSARoTdkEyg0BxRBlmAb8jsdpzebSepcdV7f6IeMpcdSMZ2t2HFZKLDspp0t4bGbN5aodGzpE9r7Y0A6pmu006ZMOpoQR"
 );
+const ITEMS_PER_PAGE = 4;
 
 exports.getProducts = (req, res) => {
+  const page = req.query.page;
+
   Product.find()
-    .then((products) => {
-      if (products.length !== 0) {
-        const productsData = JSON.stringify(products);
-        res.status(200).send(productsData);
-      } else {
-        res.status(200).send({ message: "No products found!" });
-      }
-    })
+    .countDocuments()
+    .then((productList) =>
+      Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+        .then((products) => {
+          if (products.length !== 0) {
+            const lastPage = Math.ceil(productList / ITEMS_PER_PAGE);
+            res
+              .status(200)
+              .send({ productsData: products, lastPage: lastPage });
+          } else {
+            res.status(200).send({ message: "No products found!" });
+          }
+        })
+    )
     .catch((err) =>
       res.status(500).send({ message: "Unable to load products!!" })
     );

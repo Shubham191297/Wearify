@@ -6,10 +6,9 @@ import { Form, Link, redirect } from "react-router-dom";
 import { addItemToGuestBag } from "../guest/GuestBag";
 import { getCSRFToken } from "../context/auth";
 import { imagePath } from "../utils/imagePath";
-import NextPageIcon from "../icons/NextPageIcon";
-import PrevPageIcon from "../icons/PrevPageIcon";
+import Pagination from "../layouts/Pagination";
 
-const ProductItem = ({ adminPage, products }) => {
+const ProductItem = ({ adminPage, products, pageNumber, lastPage }) => {
   return (
     <div>
       <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
@@ -87,40 +86,7 @@ const ProductItem = ({ adminPage, products }) => {
             </div>
           ))}
       </div>
-      <div className="items-center pt-4">
-        <nav
-          className="isolate inline-flex -space-x-px rounded-md shadow-sm"
-          aria-label="Pagination"
-        >
-          <a
-            href="/"
-            className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-          >
-            <span className="sr-only">Previous</span>
-            <PrevPageIcon />
-          </a>
-          <a
-            href="/"
-            aria-current="page"
-            className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
-          >
-            1
-          </a>
-          <a
-            href="/"
-            className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-          >
-            ...
-          </a>
-          <a
-            href="/"
-            className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
-          >
-            <span className="sr-only">Next</span>
-            <NextPageIcon />
-          </a>
-        </nav>
-      </div>
+      <Pagination page={pageNumber} lastPage={lastPage} />
     </div>
   );
 };
