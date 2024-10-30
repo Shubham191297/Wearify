@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 
 const Pagination = ({ page, lastPage }) => {
   return (
-    <div className="items-center pt-4">
+    <div className="items-center pt-8">
       <nav
         className="isolate inline-flex -space-x-px rounded-md shadow-sm"
         aria-label="Pagination"

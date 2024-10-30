@@ -23,11 +23,11 @@ const ProductItem = ({ adminPage, products, pageNumber, lastPage }) => {
                 ></img>
               </div>
               <div className="mt-4 flex justify-between">
-                <div>
-                  <h3 className="text-sm text-gray-700">
+                <div className="w-3/5">
+                  <h4 className="text-md text-gray-700 font-bold font-serif mx-3 text-left">
                     <Link to={`/products/${product._id}`}>{product.title}</Link>
-                  </h3>
-                  <p className="mt-2 text-sm text-gray-700 mx-2">
+                  </h4>
+                  <p className="mt-2 text-sm text-gray-700 mx-2 truncate text-left">
                     {product.description}
                   </p>
                 </div>
@@ -35,7 +35,7 @@ const ProductItem = ({ adminPage, products, pageNumber, lastPage }) => {
                   Rs. {product.price}
                 </p>
               </div>
-              <p className="mt-2 text-sm text-gray-500 mx-3 flex justify-between">
+              <p className="mt-4 text-sm text-gray-500 mx-3 flex justify-between">
                 Color:
                 <label
                   aria-label="White"
