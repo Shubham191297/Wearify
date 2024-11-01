@@ -20,6 +20,7 @@ export const loadGuestShoppingBag = () => {
 
 export const addItemToGuestBag = (productId) => {
   const products = JSON.parse(sessionStorage.getItem("products"));
+
   const guestBag = loadGuestShoppingBag();
 
   const productToBeAdded = products.find(

@@ -10,7 +10,8 @@ const multer = require("multer");
 
 const User = require("./models/user");
 const ShoppingBag = require("./models/bag");
-const sessionData = require("./utils/session-db");
+// const sessionData = require("./utils/session-db");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 
@@ -38,6 +39,7 @@ const fileFilter = (req, file, cb) => {
 const adminRoutes = require("./routes/admin");
 const shopRoutes = require("./routes/shop");
 const authRoutes = require("./routes/auth");
+const secretKey = require("./utils/secretKey");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
@@ -47,7 +49,7 @@ app.use(
   })
 );
 app.use(express.json());
-app.use(sessionData);
+// app.use(sessionData);
 app.use("/images", express.static(path.join(__dirname, "images")));
 
 app.use(cookieParser());
@@ -60,25 +62,32 @@ const csrfToken = csrf({ cookie: true });
 app.use(csrfToken);
 
 app.use((req, res, next) => {
-  if (req.session?.username) {
-    User.findOne({ where: { name: req.session.username } })
-      .then((user) => {
-        req.user = user;
-        if (user.shoppingBagId || user.email === "admin@app.com") {
-          return;
-        }
-        const shoppingBag = new ShoppingBag({ userId: user.id });
-        return shoppingBag.save().then((result) => {
-          req.user.shoppingBagId = result._id.toString();
-          return req.user.save();
+  const token = req.headers?.cookie
+    .split(";")
+    .find((cookieValue) => cookieValue.includes("jwtToken"))
+    ?.split("=")[1];
+
+  if (token) {
+    jwt.verify(token, secretKey, (err, authData) => {
+      User.findOne({ where: { name: authData.username } })
+        .then((user) => {
+          req.user = user;
+          if (user.shoppingBagId || user.email === "admin@app.com") {
+            return;
+          }
+          const shoppingBag = new ShoppingBag({ userId: user.id });
+          return shoppingBag.save().then((result) => {
+            req.user.shoppingBagId = result._id.toString();
+            return req.user.save();
+          });
+        })
+        .then(() => {
+          next();
+        })
+        .catch((err) => {
+          console.log(err);
         });
-      })
-      .then(() => {
-        next();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    });
   } else {
     next();
   }

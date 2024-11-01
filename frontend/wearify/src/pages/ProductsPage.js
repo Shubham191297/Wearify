@@ -89,7 +89,7 @@ async function loadProducts(isAdmin, { request }) {
     );
   }
 
-  sessionStorage.setItem("products", JSON.stringify(products));
+  sessionStorage.setItem("products", JSON.stringify(products.productsData));
 
   return products;
 }
@@ -100,8 +100,8 @@ export function loader({ request }) {
   });
 }
 
-export function adminLoader() {
+export function adminLoader({ request }) {
   return defer({
-    products: loadProducts("admin"),
+    products: loadProducts("admin", { request }),
   });
 }

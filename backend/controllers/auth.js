@@ -6,6 +6,8 @@ const { Op } = require("sequelize");
 const nodeMailer = require("nodemailer");
 const sendgridTransport = require("nodemailer-sendgrid-transport");
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
+const secretKey = require("../utils/secretKey");
 
 const transporter = nodeMailer.createTransport(
   sendgridTransport({
@@ -35,9 +37,6 @@ exports.postLogin = (req, res) => {
 
         return bcrypt.compare(password, user.password).then((doMatch) => {
           if (doMatch) {
-            req.session.username = user.name;
-            req.session.userId = user.email;
-
             const newCsrfToken = req.csrfToken();
 
             res.setHeader(
@@ -48,38 +47,52 @@ exports.postLogin = (req, res) => {
               })
             );
 
-            res.status(200).send({
-              message: "User logged in successfully!!",
-              username: user.name,
-            });
+            jwt.sign(
+              { username: user.name, email: user.email, id: user.id },
+              secretKey,
+              { expiresIn: "1h" },
+              (err, token) => {
+                if (err) {
+                  throw new Error(err);
+                }
+
+                res.setHeader(
+                  "Set-Cookie",
+                  cookie.serialize("jwtToken", token, {
+                    path: "/",
+                    httpOnly: true,
+                  })
+                );
+
+                res.status(200).send({
+                  username: user.name,
+                });
+              }
+            );
           } else {
             res.status(400).send({ message: "Password does not match!!" });
           }
         });
       })
-      .catch((err) => res.status(500).send({ message: "Unable to login" }));
+      .catch((err) =>
+        res.status(500).send({ message: `${err.message}. Unable to login.` })
+      );
   }
 };
 
 exports.postLogout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.log(err);
-      res.status(500).send({ message: "Unable to logout user" });
-    }
-    res.clearCookie("connect.sid", {
-      httpOnly: true,
-      secure: false,
-    });
+  res.clearCookie("jwtToken", {
+    httpOnly: true,
+    secure: false,
+  });
 
-    res.clearCookie("_csrf", {
-      httpOnly: true,
-      secure: false,
-    });
+  res.clearCookie("_csrf", {
+    httpOnly: true,
+    secure: false,
+  });
 
-    res.status(200).send({
-      message: "User logged out successfully!!",
-    });
+  res.status(200).send({
+    message: "User logged out successfully!!",
   });
 };
 

@@ -108,7 +108,6 @@ export async function action({ request }) {
     body: JSON.stringify({ email: email, password: pass }),
   });
 
-  let bagMerge;
   const errors = {};
 
   const loginInfo = await userData.json();
@@ -123,8 +122,7 @@ export async function action({ request }) {
     let isAdmin = loginInfo.username === "AdminUser";
 
     if (guestBagData?.items.length > 0 && !isAdmin) {
-      bagMerge = await mergeGuestShoppingBag(guestBagData);
-      console.log(bagMerge);
+      await mergeGuestShoppingBag(guestBagData);
     }
 
     sessionStorage.setItem(
