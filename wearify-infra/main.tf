@@ -19,7 +19,19 @@ resource "aws_internet_gateway" "wearify_igw" {
   }
 }
 
-resource "aws_route_table" "wearify-rt" {
+resource "aws_eip" "wearify_nat_ip_addr" {
+  domain = "vpc"
+}
+resource "aws_nat_gateway" "wearify_ngw" {
+  allocation_id = aws_eip.wearify_nat_ip_addr.id
+  subnet_id     = aws_subnet.wearify_public_subnet.id
+  depends_on    = [aws_vpc.wearify_vpc]
+  tags = {
+    Name = "Wearify NAT GateWay"
+  }
+}
+
+resource "aws_route_table" "wearify-public-rt" {
   vpc_id = aws_vpc.wearify_vpc.id
 
   route {
@@ -28,7 +40,20 @@ resource "aws_route_table" "wearify-rt" {
   }
 
   tags = {
-    Name = "Wearify RouteTable"
+    Name = "Wearify Public Subnet RouteTable"
+  }
+}
+
+resource "aws_route_table" "wearify-private-rt" {
+  vpc_id = aws_vpc.wearify_vpc.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.wearify_ngw.id
+  }
+
+  tags = {
+    Name = "Wearify Private Subnet RouteTable"
   }
 }
 
@@ -60,10 +85,13 @@ resource "aws_subnet" "wearify_private_subnet" {
 
 resource "aws_route_table_association" "wearify_public_subnet_association" {
   subnet_id      = aws_subnet.wearify_public_subnet.id
-  route_table_id = aws_route_table.wearify-rt.id
+  route_table_id = aws_route_table.wearify-public-rt.id
 }
 
-
+resource "aws_route_table_association" "wearify_private_subnet_association" {
+  subnet_id      = aws_subnet.wearify_private_subnet.id
+  route_table_id = aws_route_table.wearify-private-rt.id
+}
 
 # Security Group and Instance for Wearify app infra
 
@@ -86,7 +114,7 @@ resource "aws_security_group" "wearify_master_public_sg" {
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -94,7 +122,7 @@ resource "aws_security_group" "wearify_master_public_sg" {
     from_port   = 2379
     to_port     = 2380
     protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -102,7 +130,7 @@ resource "aws_security_group" "wearify_master_public_sg" {
     from_port   = 10250
     to_port     = 10250
     protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -110,7 +138,7 @@ resource "aws_security_group" "wearify_master_public_sg" {
     from_port   = 10257
     to_port     = 10259
     protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -183,28 +211,13 @@ resource "aws_security_group" "wearify_workers_private_sg" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 
-  # DB access rules for PGSQL and Mongo DB
-  egress {
-    from_port   = 27017
-    to_port     = 27017
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
-  }
-
-  egress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.2.0/24"]
-  }
-
   # Kubernetes rules for Wearify worker node
   ingress {
     description = "Worker node - Kubelet API"
     from_port   = 10250
     to_port     = 10250
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -212,7 +225,7 @@ resource "aws_security_group" "wearify_workers_private_sg" {
     from_port   = 10256
     to_port     = 10256
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -220,7 +233,7 @@ resource "aws_security_group" "wearify_workers_private_sg" {
     from_port   = 30000
     to_port     = 32767
     protocol    = "tcp"
-    cidr_blocks = ["10.0.1.0/24"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   ingress {
@@ -252,6 +265,49 @@ resource "aws_security_group" "wearify_workers_private_sg" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 
+  # Connect to master node kubeadm
+  egress {
+    description = "Allow all outbound traffic to the internet (e.g., to pull images, access AWS services)"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # All protocols
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # DB access rules for PGSQL and Mongo DB
+  egress {
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.2.0/24"]
+  }
+
+  egress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.2.0/24"]
+  }
+
+  # For NAT gateway internet access only
+  egress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 53
+    to_port     = 53
+    protocol    = "udp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
   tags = {
     Name = "Wearify worker node SG"
   }
@@ -275,7 +331,7 @@ resource "local_file" "wearify_private_key_pem" {
 
 resource "aws_instance" "wearify_master_node" {
   ami                         = var.aws_ec2_wearify_image
-  instance_type               = "t3.medium"
+  instance_type               = "t3.large"
   key_name                    = aws_key_pair.wearify_public_key.key_name
   subnet_id                   = aws_subnet.wearify_public_subnet.id
   associate_public_ip_address = true
@@ -307,7 +363,7 @@ resource "aws_instance" "wearify_master_node" {
 resource "aws_instance" "wearify_worker_node" {
   ami                         = var.aws_ec2_wearify_image
   count                       = 2
-  instance_type               = "t2.small"
+  instance_type               = "t3.medium"
   key_name                    = aws_key_pair.wearify_public_key.key_name
   subnet_id                   = aws_subnet.wearify_private_subnet.id
   associate_public_ip_address = true

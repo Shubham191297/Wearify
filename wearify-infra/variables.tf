@@ -11,7 +11,7 @@ variable "aws_ec2_wearify_image" {
 
 variable "wearify_ssh_access_ip_cidr" {
   type    = list(string)
-  default = ["152.59.2.166/32", "106.215.44.109/32", "122.175.72.96/32"]
+  default = ["152.59.2.166/32", "106.215.44.109/32", "122.175.72.96/32", "106.214.124.239/32", "204.107.141.245/32"]
 }
 
 variable "wearify_frontend_access_ip_cidr" {
