@@ -176,7 +176,7 @@ resource "aws_security_group" "wearify_workers_private_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1" # All protocols
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/16"]
   }
 
   # DB access rules for PGSQL and Mongo DB
