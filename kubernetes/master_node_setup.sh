@@ -11,11 +11,42 @@ sudo hostnamectl set-hostname "wearify-master"
 
 
 echo "============================================================================================"
-echo "------------------------ Phase 1 - Installing Container runtime ----------------------------"
+echo "------------------- Phase 1 - Linux Prerequisites for Kubernetes Setup ---------------------"
 echo "============================================================================================"
 
-# disable swap memory
+# disable swap memory current and persisting it across reboots
 sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+sudo apt-get update
+
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+lsmod | grep (br_netfilter|overlay)
+
+sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+sudo sysctl --system
+
+
+
+
+echo "============================================================================================"
+echo "------------------------ Phase 2 - Installing Container runtime ----------------------------"
+echo "============================================================================================"
+
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmour -o /etc/apt/trusted.gpg.d/docker.gpg
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
 
 sudo apt update
 sudo apt install -y containerd
@@ -29,13 +60,9 @@ sudo systemctl enable containerd
 
 
 
-
-
 echo "============================================================================================"
-echo "------------------- Phase 2 - Installing Kubectl, kubeadm & kubelet ------------------------"
+echo "------------------- Phase 3 - Installing Kubectl, kubeadm & kubelet ------------------------"
 echo "============================================================================================"
-
-sudo apt-get update
 
 # apt-transport-https may be a dummy package; if so, you can skip that package
 sudo apt-get install -y apt-transport-https ca-certificates curl gpg
@@ -57,30 +84,9 @@ sudo systemctl enable --now kubelet
 
 
 
-
-
 echo "============================================================================================"
-echo "------------ Phase 3 - Setting up master node & creating kubeadm cluster -------------------"
+echo "------------ Phase 4 - Setting up master node & creating kubeadm cluster -------------------"
 echo "============================================================================================"
-
-# Load br_netfilter module
-sudo modprobe br_netfilter
-
-# Verify it loaded
-lsmod | grep br_netfilter
-
-# Enable IPv4 forwarding and bridge-nf-call-iptables
-echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
-echo '1' | sudo tee /proc/sys/net/ipv4/ip_forward
-
-# Persist settings across reboots
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-EOF
-
-# Apply the sysctl settings immediately
-sudo sysctl --system
 
 # Initialize Kubernetes master node with Flannel pod network
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16
@@ -95,5 +101,11 @@ kubectl taint nodes --all node-role.kubernetes.io/control-plane- || true
 
 # Apply Flannel CNI plugin
 kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+
+# Sending command to worker nodes
+sudo kubeadm token create --print-join-command > worker_join.sh
+chmod +x worker_join.sh
+
+while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys worker_join.sh ubuntu@"$worker_ip":/home/ubuntu; done < worker_private_ips.txt
 
 echo "################################# COMPLETED MASTER NODE SETUP ###################################"
