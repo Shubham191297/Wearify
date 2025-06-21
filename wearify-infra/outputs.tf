@@ -24,7 +24,7 @@ output "wearify_master_node_ipv4_addr" {
 output "wearify_worker_nodes_ipv4_addr" {
   description = "Worker node(s) IP addresses for access"
 
-  value = [for instance in aws_instance.wearify_worker_node : instance.public_ip]
+  value = [for instance in aws_instance.wearify_worker_node : instance.private_ip]
 }
 
 output "wearify_master_node_arn" {

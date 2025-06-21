@@ -7,9 +7,10 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "wearify-app-infra-state-bucket"
-    key    = "env/dev/terraform.tfstate"
-    region = "us-east-1"
+    bucket            = "wearify-app-infra-state-bucket"
+    key               = "env/dev/terraform.tfstate"
+    region            = "us-east-1"
+    availability_zone = "us-east-1a"
   }
 }
 

@@ -1,6 +1,6 @@
 # Setting hostname for corresponding nodes
 
-node_number="1"
+node_number=$1
 new_hostname="wearify-worker-${node_number}"
 
 echo "$new_hostname" | sudo tee /etc/hostname
@@ -8,8 +8,41 @@ sudo hostnamectl set-hostname "$new_hostname"
 #sudo sed -i 's/localhost/$new_hostname/g' /etc/hosts
 
 
+
 echo "============================================================================================"
-echo "------------------------ Phase 1 - Installing Container runtime ----------------------------"
+echo "------------------- Phase 1 - Linux Prerequisites for Kubernetes Setup ---------------------"
+echo "============================================================================================"
+
+# disable swap memory current and persisting it across reboots
+sudo swapoff -a
+sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+
+sudo apt-get update
+
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netfilter
+EOF
+
+sudo modprobe overlay
+sudo modprobe br_netfilter
+
+lsmod | grep (br_netfilter|overlay)
+
+sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
+EOF
+
+sudo sysctl --system
+
+
+
+
+
+echo "============================================================================================"
+echo "------------------------ Phase 2 - Installing Container runtime ----------------------------"
 echo "============================================================================================"
 
 # disable swap memory
@@ -28,7 +61,7 @@ sudo systemctl enable containerd
 
 
 echo "============================================================================================"
-echo "------------------- Phase 2 - Installing Kubectl, kubeadm & kubelet ------------------------"
+echo "--------------------- Phase 3 - Installing kubeadm & kubelet -------------------------------"
 echo "============================================================================================"
 
 sudo apt-get update
@@ -54,29 +87,10 @@ sudo systemctl enable --now kubelet
 
 
 echo "============================================================================================"
-echo "---------------     Phase 3 - Join worker node to kubeadm cluster     ---------------------"
+echo "---------------     Phase 4 - Join worker node to kubeadm cluster     ---------------------"
 echo "============================================================================================"
 
-# Load br_netfilter module
-sudo modprobe br_netfilter
-
-# Verify it loaded
-lsmod | grep br_netfilter
-
-# Enable IPv4 forwarding and bridge-nf-call-iptables
-echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
-echo '1' | sudo tee /proc/sys/net/ipv4/ip_forward
-
-# Persist settings across reboots
-cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-iptables = 1
-net.ipv4.ip_forward = 1
-EOF
-
-# Apply the sysctl settings immediately
-sudo sysctl --system
-
-sudo kubeadm join --token <token> <control-plane-host>:<control-plane-port> --discovery-token-ca-cert-hash sha256:<hash>
+sudo ./worker_join.sh
 
 
 echo "############################ COMPLETED WORKER NODE SETUP ################################"

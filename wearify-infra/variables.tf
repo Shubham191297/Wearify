@@ -6,7 +6,7 @@ variable "aws_region" {
 
 variable "aws_ec2_wearify_image" {
   type    = string
-  default = "ami-020cba7c55df1f615"
+  default = "ami-0a7d80731ae1b2435"
 }
 
 variable "wearify_ssh_access_ip_cidr" {
