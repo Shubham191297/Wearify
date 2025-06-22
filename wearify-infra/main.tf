@@ -19,17 +19,6 @@ resource "aws_internet_gateway" "wearify_igw" {
   }
 }
 
-resource "aws_eip" "wearify_nat_ip_addr" {
-  domain = "vpc"
-}
-resource "aws_nat_gateway" "wearify_ngw" {
-  allocation_id = aws_eip.wearify_nat_ip_addr.id
-  subnet_id     = aws_subnet.wearify_public_subnet.id
-  depends_on    = [aws_vpc.wearify_vpc]
-  tags = {
-    Name = "Wearify NAT GateWay"
-  }
-}
 
 resource "aws_route_table" "wearify-public-rt" {
   vpc_id = aws_vpc.wearify_vpc.id
@@ -43,54 +32,20 @@ resource "aws_route_table" "wearify-public-rt" {
     Name = "Wearify Public Subnet RouteTable"
   }
 }
-
-resource "aws_route_table" "wearify-private-rt" {
-  vpc_id = aws_vpc.wearify_vpc.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.wearify_ngw.id
-  }
-
-  tags = {
-    Name = "Wearify Private Subnet RouteTable"
-  }
-}
-
 resource "aws_subnet" "wearify_public_subnet" {
   vpc_id                  = aws_vpc.wearify_vpc.id
   cidr_block              = "10.0.1.0/24"
   map_public_ip_on_launch = true
+  availability_zone       = var.wearify_az
 
   tags = {
     Name = "Public subnet for wearify app"
   }
 }
 
-resource "aws_subnet" "wearify_private_subnet" {
-  vpc_id                  = aws_vpc.wearify_vpc.id
-  cidr_block              = "10.0.2.0/24"
-  map_public_ip_on_launch = true
-
-  tags = {
-    Name = "Private subnet for wearify app"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      tags["Name"]
-    ]
-  }
-}
-
 resource "aws_route_table_association" "wearify_public_subnet_association" {
   subnet_id      = aws_subnet.wearify_public_subnet.id
   route_table_id = aws_route_table.wearify-public-rt.id
-}
-
-resource "aws_route_table_association" "wearify_private_subnet_association" {
-  subnet_id      = aws_subnet.wearify_private_subnet.id
-  route_table_id = aws_route_table.wearify-private-rt.id
 }
 
 # Instance for Wearify app infra
@@ -118,14 +73,14 @@ resource "aws_instance" "wearify_master_node" {
   subnet_id                   = aws_subnet.wearify_public_subnet.id
   associate_public_ip_address = true
 
-  vpc_security_group_ids = [aws_security_group.wearify_master_public_sg.id]
+  vpc_security_group_ids = [aws_security_group.wearify_master_sg.id]
 
   root_block_device {
     volume_size = 40    # Disk size in GB
     volume_type = "gp2" # General Purpose SSD
   }
 
-  depends_on = [aws_key_pair.wearify_public_key, aws_security_group.wearify_master_public_sg]
+  depends_on = [aws_key_pair.wearify_public_key, aws_security_group.wearify_master_sg]
 
   user_data = <<-EOF
               #!/bin/bash
@@ -145,14 +100,14 @@ resource "aws_instance" "wearify_master_node" {
 resource "aws_instance" "wearify_worker_node" {
   ami                         = var.aws_ec2_wearify_image
   count                       = 2
-  instance_type               = "t3.medium"
+  instance_type               = "t3.large"
   key_name                    = aws_key_pair.wearify_public_key.key_name
-  subnet_id                   = aws_subnet.wearify_private_subnet.id
+  subnet_id                   = aws_subnet.wearify_public_subnet.id
   associate_public_ip_address = true
 
-  vpc_security_group_ids = [aws_security_group.wearify_workers_private_sg.id]
+  vpc_security_group_ids = [aws_security_group.wearify_worker_sg.id]
 
-  depends_on = [aws_key_pair.wearify_public_key, aws_security_group.wearify_workers_private_sg]
+  depends_on = [aws_key_pair.wearify_public_key, aws_security_group.wearify_worker_sg]
 
   root_block_device {
     volume_size = 30    # Disk size in GB

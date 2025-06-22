@@ -14,7 +14,7 @@ EOT
 # COPY IPs and Master node setup file to master 
 
 resource "null_resource" "send_worker_ips_and_setup_script_to_master" {
-  depends_on = [aws_instance.wearify_master_node, null_resource.write_worker_ips]
+  depends_on = [aws_instance.wearify_master_node, aws_instance.wearify_worker_node, null_resource.write_worker_ips]
 
   # File provisioner for worker IPs
   provisioner "file" {
@@ -55,8 +55,6 @@ resource "null_resource" "send_worker_ips_and_setup_script_to_master" {
     }
   }
 }
-
-
 
 
 # COPY Worker node setup script to worker

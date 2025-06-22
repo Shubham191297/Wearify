@@ -27,8 +27,6 @@ EOF
 sudo modprobe overlay
 sudo modprobe br_netfilter
 
-lsmod | grep (br_netfilter|overlay)
-
 sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
@@ -45,13 +43,11 @@ echo "==========================================================================
 echo "------------------------ Phase 2 - Installing Container runtime ----------------------------"
 echo "============================================================================================"
 
-# disable swap memory
-sudo swapoff -a
-
 sudo apt update
 sudo apt install -y containerd
 
-containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml > /dev/null 2>&1
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
 sudo systemctl restart containerd

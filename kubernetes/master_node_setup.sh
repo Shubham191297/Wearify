@@ -28,7 +28,7 @@ EOF
 sudo modprobe overlay
 sudo modprobe br_netfilter
 
-lsmod | grep (br_netfilter|overlay)
+lsmod | grep -E 'br_netfilter|overlay'
 
 sudo tee /etc/sysctl.d/kubernetes.conf <<EOF
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -51,7 +51,8 @@ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubun
 sudo apt update
 sudo apt install -y containerd
 
-containerd config default | sudo tee /etc/containerd/config.toml > /dev/null
+sudo mkdir -p /etc/containerd
+containerd config default | sudo tee /etc/containerd/config.toml > /dev/null 2>&1
 sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
 sudo systemctl restart containerd
@@ -65,7 +66,9 @@ echo "------------------- Phase 3 - Installing Kubectl, kubeadm & kubelet ------
 echo "============================================================================================"
 
 # apt-transport-https may be a dummy package; if so, you can skip that package
-sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+# sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+sudo apt install -y curl gnupg2 software-properties-common apt-transport-https ca-certificates
+
 
 # Downloading the public signing key for the Kubernetes package repositories
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.33/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg

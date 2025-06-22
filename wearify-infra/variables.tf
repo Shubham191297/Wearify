@@ -23,3 +23,8 @@ variable "wearify_aws_keypair" {
   type    = string
   default = "wearify_keypair"
 }
+
+variable "wearify_az" {
+  type    = string
+  default = "us-east-1a"
+}

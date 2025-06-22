@@ -13,7 +13,7 @@ output "master_node_subnet" {
 output "worker_node_subnet" {
   description = "Subnet id of Wearify worker node"
   sensitive   = false
-  value       = aws_subnet.wearify_private_subnet.id
+  value       = aws_subnet.wearify_public_subnet.id
 }
 
 output "wearify_master_node_ipv4_addr" {
@@ -28,13 +28,13 @@ output "wearify_worker_nodes_ipv4_addr" {
 }
 
 output "wearify_master_node_arn" {
-  description = "ARN for master node of wearify"
-  value       = aws_instance.wearify_master_node.arn
+  description = "Public DNS hostname for master node of wearify"
+  value       = aws_instance.wearify_master_node.public_dns
 }
 
 output "wearify_worker_node_arn" {
-  description = "ARN for worker node of wearify"
-  value       = [for instance in aws_instance.wearify_worker_node : instance.arn]
+  description = "Public DNS hostname for worker node of wearify"
+  value       = [for instance in aws_instance.wearify_worker_node : instance.public_dns]
 }
 
 output "wearify_keypair" {
