@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const psSequelize = require("./utils/pgsql-database");
 const mongoose = require("mongoose");
+const { mongoURL } = require("./utils/db-url");
 const path = require("path");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
@@ -102,10 +103,10 @@ psSequelize
   .then(() => {
     console.log("\nConnected to PG SQL successfully!!");
     mongoose
-      .connect("mongodb://localhost:27017/wearify")
+      .connect(mongoURL + "/wearify")
       .then(() => {
         console.log("Connected to Mongo DB successfully!!");
-        app.listen(5000);
+        app.listen(5001);
       })
       .catch((err) => console.log(err));
   })
