@@ -2,7 +2,7 @@ FROM mongo
 
 EXPOSE 27017 
 
-RUN useradd -m wearify && echo "wearify:1234" | chpasswd
+RUN useradd -m -s /bin/bash wearify && echo "wearify:1234" | chpasswd
 
 RUN apt-get update && apt-get install -y git bash
 
