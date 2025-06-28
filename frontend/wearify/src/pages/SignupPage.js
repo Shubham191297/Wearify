@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, redirect, useActionData } from "react-router-dom";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const SignupPage = () => {
   const errors = useActionData();
@@ -138,7 +139,7 @@ export async function action({ request }) {
   const errors = {};
   const csrfToken = await getCSRFToken();
 
-  const res = await fetch("http://localhost:5000/auth/signup", {
+  const res = await fetch(`${serverURL}auth/signup`, {
     method: request.method,
     body: JSON.stringify({ username, email, password, confirmpass }),
     headers: {

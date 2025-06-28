@@ -1,6 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import CustomError from "../layouts/CustomError";
+import { serverURL } from "../utils/backendURL";
 
 const AuthContext = React.createContext({
   user: { isLoggedIn: Boolean, username: String, roleAdmin: Boolean },
@@ -52,7 +53,7 @@ export const AuthProvider = (props) => {
 export default AuthContext;
 
 export async function getCSRFToken() {
-  const response = await fetch("http://localhost:5000/auth/csrfToken", {
+  const response = await fetch(`${serverURL}auth/csrfToken`, {
     credentials: "include",
   });
   const tokenData = await response.json();

@@ -1,4 +1,5 @@
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 export const loadGuestShoppingBag = () => {
   const guestShoppingBagEmpty = !sessionStorage.getItem("guestShoppingBag");
@@ -69,7 +70,7 @@ export const removeItemFromGuestBag = (productId) => {
 
 export const mergeGuestShoppingBag = async (guestBagData) => {
   const csrfToken = await getCSRFToken();
-  const res = await fetch("http://localhost:5000/shoppingBag", {
+  const res = await fetch(`${serverURL}shoppingBag`, {
     method: "PUT",
     body: JSON.stringify({ guestBagData }),
     headers: {

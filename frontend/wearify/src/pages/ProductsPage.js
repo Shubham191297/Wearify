@@ -11,6 +11,7 @@ import ProductList from "../components/ProductList";
 import AuthContext, { getCSRFToken } from "../context/auth";
 import ErrorPage from "../layouts/ErrorPage";
 import CustomError from "../layouts/CustomError";
+import { serverURL } from "../utils/backendURL";
 
 const ProductsPage = ({ adminPage = false }) => {
   const { products } = useLoaderData();
@@ -68,9 +69,7 @@ async function loadProducts(isAdmin, { request }) {
   const page = url.searchParams.get("page") || 1;
 
   const response = await fetch(
-    "http://localhost:5000/" +
-      (isAdmin ? "admin/products/" : "products/") +
-      `?page=${page}`,
+    serverURL + (isAdmin ? "admin/products/" : "products/") + `?page=${page}`,
     {
       credentials: "include",
       headers: {

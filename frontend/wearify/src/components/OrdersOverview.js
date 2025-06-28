@@ -3,6 +3,7 @@ import NoOrders from "../pages/NoOrders";
 import { imagePath } from "../utils/imagePath";
 import { Form } from "react-router-dom";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const OrdersOverview = ({ orders }) => {
   const noOrders = orders.length === 0;
@@ -87,7 +88,7 @@ export async function action({ request }) {
   const orderId = formData.get("orderId");
   const csrfToken = await getCSRFToken();
 
-  const resData = await fetch("http://localhost:5000/orders/" + orderId, {
+  const resData = await fetch(`${serverURL}orders/` + orderId, {
     credentials: "include",
     headers: {
       "X-CSRF-Token": csrfToken,

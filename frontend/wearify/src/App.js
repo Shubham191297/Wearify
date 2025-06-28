@@ -20,6 +20,7 @@ import ShoppingBagPage, {
 import { loader as ordersLoader } from "./pages/OrdersPage";
 import { action as productListActions } from "./components/ProductList";
 import { action as productActions } from "./components/ProductForm";
+import { action as productDetailActions } from "./components/ProductOverview";
 import { action as orderActions } from "./components/OrdersOverview";
 import LoginPage, { action as loginActions } from "./pages/LoginPage";
 import ErrorPage from "./layouts/ErrorPage";
@@ -52,6 +53,7 @@ const router = createBrowserRouter([
             path: ":productId",
             id: "product-detail",
             loader: productDetailsLoader,
+            action: productDetailActions,
             element: <ProductDetails />,
           },
         ],

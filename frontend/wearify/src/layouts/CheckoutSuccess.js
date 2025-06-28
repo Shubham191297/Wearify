@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Await, defer, useLoaderData, useNavigate } from "react-router-dom";
 import ErrorPage from "./ErrorPage";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const CheckoutSuccess = () => {
   const { checkOutOrder } = useLoaderData();
@@ -33,7 +34,7 @@ const CheckoutSuccess = () => {
                           <li className="flex py-6" key={item.productData._id}>
                             <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-gray-200">
                               <img
-                                src={`http://localhost:5000/${item.productData.image}`}
+                                src={`${serverURL}${item.productData.image}`}
                                 alt="Salmon orange fabric pouch with match zipper, gray zipper pull, and adjustable hip belt."
                                 className="h-full w-full object-cover object-center"
                               />
@@ -87,7 +88,7 @@ export default CheckoutSuccess;
 async function loadCheckoutSuccess() {
   const csrfToken = await getCSRFToken();
 
-  const resData = await fetch("http://localhost:5000/orders", {
+  const resData = await fetch(`${serverURL}orders`, {
     method: "POST",
     headers: { "X-CSRF-Token": csrfToken },
     credentials: "include",

@@ -3,6 +3,7 @@ import { defer, Await, useRouteLoaderData } from "react-router-dom";
 import ProductForm from "./ProductForm";
 import ErrorPage from "../layouts/ErrorPage";
 import CustomError from "../layouts/CustomError";
+import { serverURL } from "../utils/backendURL";
 
 const EditProduct = ({ editMode }) => {
   const { product } = useRouteLoaderData("edit-product");
@@ -30,7 +31,7 @@ const EditProduct = ({ editMode }) => {
 export default EditProduct;
 
 async function loadProduct(id) {
-  const response = await fetch("http://localhost:5000/admin/products/" + id, {
+  const response = await fetch(`${serverURL}admin/products/` + id, {
     credentials: "include",
   });
 

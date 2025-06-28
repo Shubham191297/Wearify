@@ -4,6 +4,7 @@ import OrdersOverview from "../components/OrdersOverview";
 import CustomError from "../layouts/CustomError";
 import ErrorPage from "../layouts/ErrorPage";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const OrdersPage = () => {
   const { orders } = useLoaderData();
@@ -23,7 +24,7 @@ export default OrdersPage;
 
 async function loadOrders() {
   const csrfToken = await getCSRFToken();
-  const response = await fetch("http://localhost:5000/orders/", {
+  const response = await fetch(`${serverURL}orders/`, {
     credentials: "include",
     headers: {
       "X-CSRF-Token": csrfToken,

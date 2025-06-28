@@ -8,6 +8,7 @@ import {
 import CustomError from "../layouts/CustomError";
 import ErrorPage from "../layouts/ErrorPage";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const ShoppingBagPage = () => {
   const { shoppingBag } = useLoaderData();
@@ -36,7 +37,7 @@ async function loadShoppingBag() {
   }
 
   const csrfToken = await getCSRFToken();
-  const response = await fetch("http://localhost:5000/shoppingBag/", {
+  const response = await fetch(`${serverURL}shoppingBag/`, {
     credentials: "include",
     headers: {
       "X-CSRF-Token": csrfToken,
@@ -77,9 +78,7 @@ export async function action({ request }) {
     return redirect("/login");
   }
 
-  const url =
-    "http://localhost:5000/" +
-    (deleteItemAction ? "shoppingBagItem" : "checkout");
+  const url = serverURL + (deleteItemAction ? "shoppingBagItem" : "checkout");
 
   const bodyData = deleteItemAction
     ? { productId: formData.get("productId") }

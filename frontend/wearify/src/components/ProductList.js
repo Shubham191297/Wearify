@@ -7,6 +7,7 @@ import { addItemToGuestBag } from "../guest/GuestBag";
 import { getCSRFToken } from "../context/auth";
 import { imagePath } from "../utils/imagePath";
 import Pagination from "../layouts/Pagination";
+import { serverURL } from "../utils/backendURL";
 
 const ProductItem = ({ adminPage, products, pageNumber, lastPage }) => {
   return (
@@ -107,7 +108,7 @@ export async function action({ request }) {
   }
 
   const requestUrl =
-    "http://localhost:5000/" +
+    serverURL +
     (actionType === "cart-action" ? "shoppingBag" : "admin/delete-product");
 
   const response = await fetch(requestUrl, {

@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, useActionData, useNavigate } from "react-router-dom";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const ChangePassword = () => {
   const actionData = useActionData();
@@ -91,7 +92,7 @@ export async function action({ params, request }) {
   }
 
   const resData = await fetch(
-    `http://localhost:5000/auth/change-password/${resetTokenValue}`,
+    `${serverURL}auth/change-password/${resetTokenValue}`,
     {
       method: request.method,
       body: JSON.stringify({ updatedPassword }),

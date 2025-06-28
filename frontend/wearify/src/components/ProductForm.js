@@ -2,6 +2,7 @@ import React from "react";
 import { useState } from "react";
 import { Form, redirect, useActionData } from "react-router-dom";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const productDefaultValue = {
   title: "",
@@ -208,7 +209,7 @@ export async function action({ request, params }) {
   const errors = {};
 
   const requestUrl =
-    "http://localhost:5000/admin/" +
+    `${serverURL}admin/` +
     (request.method === "POST"
       ? "add-product"
       : `edit-product/${params.productId}`);

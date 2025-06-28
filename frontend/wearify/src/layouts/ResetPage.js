@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, useActionData } from "react-router-dom";
 import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
 
 const ResetPage = () => {
   const responseMessage = useActionData();
@@ -58,7 +59,7 @@ export async function action({ request }) {
   const userEmail = formData.get("userEmail");
   const csrfToken = await getCSRFToken();
 
-  const resData = await fetch("http://localhost:5000/auth/reset-password", {
+  const resData = await fetch(`${serverURL}auth/reset-password`, {
     body: JSON.stringify({ email: userEmail }),
     method: request.method,
     headers: {

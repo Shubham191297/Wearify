@@ -1,6 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { imagePath } from "../utils/imagePath";
+import { Form } from "react-router-dom";
+import BagIcon from "../icons/BagIcon";
+import { getCSRFToken } from "../context/auth";
+import { serverURL } from "../utils/backendURL";
+import { addItemToGuestBag } from "../guest/GuestBag";
+import { redirect } from "react-router-dom";
 
 const ProductOverview = ({ product }) => {
   return (
@@ -77,7 +83,7 @@ const ProductOverview = ({ product }) => {
               Rs. {product.price}
             </p>
 
-            <form className="mt-10">
+            <Form className="mt-10" method="post">
               <div>
                 <h3 className="text-sm font-medium text-gray-900">Color</h3>
 
@@ -102,13 +108,15 @@ const ProductOverview = ({ product }) => {
                   </div>
                 </fieldset>
               </div>
+              <input type="hidden" name="productId" value={product._id} />
               <button
                 type="submit"
                 className="mt-10 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
               >
-                Add to bag
+                <span className="mx-2">Add to Bag </span>
+                <BagIcon />
               </button>
-            </form>
+            </Form>
           </div>
 
           <div className="py-10 lg:col-span-2 lg:col-start-1 lg:border-r lg:border-gray-200 lg:pb-16 lg:pr-8 lg:pt-6">
@@ -127,3 +135,35 @@ const ProductOverview = ({ product }) => {
 };
 
 export default ProductOverview;
+
+export async function action({ request }) {
+  const formData = await request.formData();
+  const productId = formData.get("productId");
+  const csrfToken = await getCSRFToken();
+
+  const guestShoppingBag = !sessionStorage.getItem("user");
+
+  if (guestShoppingBag) {
+    addItemToGuestBag(productId);
+    return redirect("/shoppingBag");
+  }
+
+  const requestUrl = `${serverURL}shoppingBag`;
+
+  const response = await fetch(requestUrl, {
+    method: request.method,
+    body: JSON.stringify({ productId }),
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRF-Token": csrfToken,
+    },
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to add product to bag");
+  }
+  await response.json();
+
+  return redirect("/shoppingBag");
+}
