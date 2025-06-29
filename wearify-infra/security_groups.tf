@@ -138,7 +138,8 @@ resource "aws_security_group_rule" "ssh_worker_access" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  # cidr_blocks       = ["0.0.0.0/0"]
+  source_security_group_id = aws_security_group.wearify_master_sg.id
 }
 
 resource "aws_security_group_rule" "etcd_worker_outbound_access" {
@@ -240,7 +241,7 @@ resource "aws_security_group_rule" "worker_internet_access_https" {
   cidr_blocks       = var.wearify_frontend_access_ip_cidr
 }
 
-resource "aws_security_group_rule" "nodeport_services_inbound_access" {
+resource "aws_security_group_rule" "mongo_clusterip_services_inbound_access" {
   security_group_id        = aws_security_group.wearify_worker_sg.id
   type                     = "egress"
   from_port                = 27017
@@ -249,7 +250,7 @@ resource "aws_security_group_rule" "nodeport_services_inbound_access" {
   source_security_group_id = aws_security_group.wearify_worker_sg.id
 }
 
-resource "aws_security_group_rule" "nodeport_services_inbound_access" {
+resource "aws_security_group_rule" "postgre_clusterip_services_inbound_access" {
   security_group_id        = aws_security_group.wearify_worker_sg.id
   type                     = "egress"
   from_port                = 5432

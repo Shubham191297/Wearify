@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgre-wearify-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/postgre"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgre-wearify-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgre-wearify-deployment
+  labels:
+    app: postgre-wearify
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: postgre-wearify
+  template:
+    metadata:
+      labels:
+        app: postgre-wearify
+    spec:
+      containers:
+        - name: postgre-wearify
+          image: shubh1917/wearify-postgre
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgre-storage
+      volumes:
+        - name: postgre-storage
+          persistentVolumeClaim:
+            claimName: postgre-wearify-pvc

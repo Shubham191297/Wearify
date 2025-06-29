@@ -110,5 +110,6 @@ sudo kubeadm token create --print-join-command > worker_join.sh
 chmod +x worker_join.sh
 
 while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys worker_join.sh ubuntu@"$worker_ip":/home/ubuntu; done < worker_private_ips.txt
+while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys worker_join.sh ubuntu@"$worker_ip":/home/ubuntu; done < ./k8s-manifests/deployments/makeVolumes.sh
 
 echo "################################# COMPLETED MASTER NODE SETUP ###################################"

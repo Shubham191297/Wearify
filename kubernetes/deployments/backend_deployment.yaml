@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: backend-wearify-pv
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/data/backend"
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: backend-wearify-pvc
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-wearify-deployment
+  labels:
+    app: backend-wearify
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: backend-wearify
+  template:
+    metadata:
+      labels:
+        app: backend-wearify
+    spec:
+      containers:
+        - name: backend-wearify
+          image: shubh1917/wearify-backend
+          ports:
+            - containerPort: 5000
+          volumeMounts:
+            - mountPath: /home/wearify/Wearify/backend
+              name: backend-storage
+      volumes:
+        - name: backend-storage
+          persistentVolumeClaim:
+            claimName: backend-wearify-pvc
