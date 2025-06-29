@@ -4,27 +4,24 @@ EXPOSE 3000
 
 RUN apt-get update && apt-get install git bash npm sudo -y
 
-RUN useradd -m -s /bin/bash wearify  && echo "wearify:1234" | chpasswd
-
+RUN useradd -m -s /bin/bash wearify && echo "wearify:1234" | chpasswd
 RUN usermod -aG sudo wearify
 
 USER wearify
+WORKDIR /home/wearify
 
-RUN git clone https://github.com/Shubham191297/Wearify.git /home/wearify/Wearify
+RUN git clone https://github.com/Shubham191297/Wearify.git
+
 
 WORKDIR /home/wearify/Wearify/frontend
 
 RUN npm install
 
+RUN sed -i 's|http://localhost:5001/|http://wearify-backend:5000/|g' wearify/src/utils/backendURL.js
+RUN sed -i 's|http://localhost:5001/|http://wearify-backend:5000/|g' wearify/src/utils/imagePath.js
+
 WORKDIR /home/wearify/Wearify/frontend/wearify
-RUN ls -la /home/wearify/Wearify/frontend/wearify/src/utils/
-RUN cat /home/wearify/Wearify/frontend/wearify/src/utils/backendURL.js
-
-RUN ls -la /home/wearify/Wearify
-
-RUN sed -i 's|export const serverURL = "http://localhost:5001/";|export const serverURL = "http://wearify-backend:5000/";|' /home/wearify/Wearify/frontend/wearify/src/utils/backendURL.js
-RUN sed -i 's|export const imagePath = "http://localhost:5001/";|export const imagePath = "http://wearify-backend:5000/";|' /home/wearify/Wearify/frontend/wearify/src/utils/imagePath.js
 
 RUN npm install
 
-CMD ["npm","start"]
+CMD ["npm", "start"]

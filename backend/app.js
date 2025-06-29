@@ -8,6 +8,7 @@ const path = require("path");
 const csrf = require("csurf");
 const cookieParser = require("cookie-parser");
 const multer = require("multer");
+const serverSettings = require("./utils/serverURL");
 
 const User = require("./models/user");
 const ShoppingBag = require("./models/bag");
@@ -45,7 +46,7 @@ const secretKey = require("./utils/secretKey");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: serverSettings.frontendURL,
     credentials: true,
   })
 );
@@ -60,6 +61,7 @@ app.use(
 );
 
 const csrfToken = csrf({ cookie: true });
+console.log(csrfToken);
 app.use(csrfToken);
 
 app.use((req, res, next) => {
@@ -106,7 +108,7 @@ psSequelize
       .connect(mongoURL + "/wearify")
       .then(() => {
         console.log("Connected to Mongo DB successfully!!");
-        app.listen(5001);
+        app.listen(serverSettings.serverPort, serverSettings.serverHost);
       })
       .catch((err) => console.log(err));
   })

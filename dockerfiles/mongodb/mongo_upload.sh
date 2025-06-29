@@ -3,9 +3,9 @@ docker logout
 docker login --username shubh1917
 
 echo "###### Building mongodb image for wearify #########"
-docker build -t wearify-mongodb -f mongoDockerfile .
+docker build -t wearify-mongodb --no-cache -f mongoDockerfile .
 
-echo "###### Tagginf mongodb image for wearify #########"
+echo "###### Tagging mongodb image for wearify #########"
 docker tag wearify-mongodb shubh1917/wearify-mongodb:latest
 
 

@@ -4,6 +4,7 @@ const ShoppingBag = require("../models/bag.js");
 const Order = require("../models/order.js");
 const Product = require("../models/product.js");
 const pdfGenerator = require("../data/pdfGenerator.js");
+const { frontendURL } = require("../utils/serverURL.js");
 const stripe = require("stripe")(
   "sk_test_51MM08RSARoTdkEyg0BxRBlmAb8jsdpzebSepcdV7f6IeMpcdSMZ2t2HFZKLDspp0t4bGbN5aodGzpE9r7Y0A6pmu006ZMOpoQR"
 );
@@ -268,8 +269,8 @@ exports.postCheckout = (req, res) => {
                 };
               }),
               mode: "payment",
-              success_url: "http://localhost:3000/checkout-success",
-              cancel_url: "http://localhost:3000/shoppingBag",
+              success_url: `${frontendURL}/checkout-success`,
+              cancel_url: `${frontendURL}/shoppingBag`,
               customer: customer.id,
             })
           );
