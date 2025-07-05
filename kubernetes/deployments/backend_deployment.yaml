@@ -34,7 +34,7 @@ metadata:
   labels:
     app: backend-wearify
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: backend-wearify
@@ -46,12 +46,13 @@ spec:
       containers:
         - name: backend-wearify
           image: shubh1917/wearify-backend
+          imagePullPolicy: Always
           ports:
             - containerPort: 5000
-          volumeMounts:
-            - mountPath: /home/wearify/Wearify/backend
-              name: backend-storage
-      volumes:
-        - name: backend-storage
-          persistentVolumeClaim:
-            claimName: backend-wearify-pvc
+      #     volumeMounts:
+      #       - mountPath: /home/wearify/Wearify/backend/images
+      #         name: backend-storage
+      # volumes:
+      #   - name: backend-storage
+      #     persistentVolumeClaim:
+      #       claimName: backend-wearify-pvc

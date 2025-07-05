@@ -44,12 +44,28 @@ const authRoutes = require("./routes/auth");
 const secretKey = require("./utils/secretKey");
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(
   cors({
-    origin: serverSettings.frontendURL,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true); // curl/postman ke liye allow
+
+      const isLocalhost = origin.includes("localhost:3000");
+      const isNodePortAccess = /^http:\/\/\d{1,3}(\.\d{1,3}){3}:32000$/.test(
+        origin
+      );
+
+      if (isLocalhost || isNodePortAccess) {
+        return callback(null, true);
+      } else {
+        console.log("Blocked CORS origin:", origin);
+        return callback(new Error("CORS policy: Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(express.json());
 // app.use(sessionData);
 app.use("/images", express.static(path.join(__dirname, "images")));
@@ -66,7 +82,7 @@ app.use(csrfToken);
 
 app.use((req, res, next) => {
   const token = req.headers?.cookie
-    .split(";")
+    ?.split(";")
     .find((cookieValue) => cookieValue.includes("jwtToken"))
     ?.split("=")[1];
 
@@ -108,7 +124,7 @@ psSequelize
       .connect(mongoURL + "/wearify")
       .then(() => {
         console.log("Connected to Mongo DB successfully!!");
-        app.listen(serverSettings.serverPort, serverSettings.serverHost);
+        app.listen(serverSettings.serverPort);
       })
       .catch((err) => console.log(err));
   })

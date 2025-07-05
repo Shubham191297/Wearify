@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: postgre-wearify-pv
   labels:
-    type: local
+    type: sql
 spec:
   storageClassName: manual
   capacity:
@@ -15,9 +15,30 @@ spec:
 
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: wearify
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: "1319"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  namespace: wearify
+data:
+  POSTGRES_DB: wearify
+  POSTGRES_USER: sthapliyal
+
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgre-wearify-pvc
+  namespace: wearify
 spec:
   storageClassName: manual
   accessModes:
@@ -25,12 +46,16 @@ spec:
   resources:
     requests:
       storage: 5Gi
+  selector:
+    matchLabels:
+      type: sql
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: postgre-wearify-deployment
+  namespace: wearify
   labels:
     app: postgre-wearify
 spec:
@@ -51,7 +76,27 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/postgresql/data
               name: postgre-storage
+          envFrom:
+            - configMapRef:
+                name: postgres-config
+            - secretRef:
+                name: postgres-secret
       volumes:
         - name: postgre-storage
           persistentVolumeClaim:
             claimName: postgre-wearify-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wearify-postgres
+  namespace: wearify
+spec:
+  selector:
+    app: postgre-wearify
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP

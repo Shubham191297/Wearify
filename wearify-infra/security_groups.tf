@@ -58,12 +58,12 @@ resource "aws_security_group_rule" "flannel_master_inbound_access" {
 }
 
 resource "aws_security_group_rule" "flannel_master_outbound_access" {
-  security_group_id        = aws_security_group.wearify_master_sg.id
-  type                     = "egress"
-  from_port                = 8472
-  to_port                  = 8472
-  protocol                 = "udp"
-  source_security_group_id = aws_security_group.wearify_worker_sg.id
+  security_group_id = aws_security_group.wearify_master_sg.id
+  type              = "egress"
+  from_port         = 8472
+  to_port           = 8472
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "coredns_udp_master_inbound_access" {
@@ -128,6 +128,47 @@ resource "aws_security_group_rule" "ssh_master_bastion_worker" {
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.wearify_worker_sg.id
 }
+
+resource "aws_security_group_rule" "mongo_master_inbound_access" {
+  security_group_id        = aws_security_group.wearify_master_sg.id
+  type                     = "egress"
+  from_port                = 27017
+  to_port                  = 27017
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "postgre_master_inbound_access" {
+  security_group_id        = aws_security_group.wearify_master_sg.id
+  type                     = "egress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "allow_icmp_master_ingress" {
+  security_group_id        = aws_security_group.wearify_master_sg.id
+  type                     = "ingress"
+  from_port                = -1
+  to_port                  = -1
+  protocol                 = "icmp"
+  source_security_group_id = aws_security_group.wearify_master_sg.id
+}
+
+resource "aws_security_group_rule" "allow_icmp_master_egress" {
+  security_group_id = aws_security_group.wearify_master_sg.id
+  type              = "egress"
+  from_port         = -1
+  to_port           = -1
+  protocol          = "icmp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+
+
+
+
 
 
 ################## Worker node security group rules ######################
@@ -257,4 +298,141 @@ resource "aws_security_group_rule" "postgre_clusterip_services_inbound_access" {
   to_port                  = 5432
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "postgres_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "mongodb_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 27017
+  to_port                  = 27017
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+
+resource "aws_security_group_rule" "postgres_master_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_master_sg.id
+}
+
+resource "aws_security_group_rule" "mongodb_master_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 27017
+  to_port                  = 27017
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_master_sg.id
+}
+
+resource "aws_security_group_rule" "react_worker_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "react_worker_outbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "egress"
+  from_port                = 3000
+  to_port                  = 3000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "node_worker_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "node_worker_outbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "egress"
+  from_port                = 5000
+  to_port                  = 5000
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+
+resource "aws_security_group_rule" "nginx_worker_inbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "nginx_80_worker_inbound" {
+  security_group_id = aws_security_group.wearify_worker_sg.id
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "nginx_worker_outbound" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "egress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "allow_icmp_worker_ingress" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = -1
+  to_port                  = -1
+  protocol                 = "icmp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "allow_icmp_worker_egress" {
+  security_group_id = aws_security_group.wearify_worker_sg.id
+  type              = "egress"
+  from_port         = -1
+  to_port           = -1
+  protocol          = "icmp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "flannel_worker_ingress_self" {
+  security_group_id        = aws_security_group.wearify_worker_sg.id
+  type                     = "ingress"
+  from_port                = 8472
+  to_port                  = 8472
+  protocol                 = "udp"
+  source_security_group_id = aws_security_group.wearify_worker_sg.id
+}
+
+resource "aws_security_group_rule" "flannel_worker_egress_self" {
+  security_group_id = aws_security_group.wearify_worker_sg.id
+  type              = "egress"
+  from_port         = 8472
+  to_port           = 8472
+  protocol          = "udp"
+  cidr_blocks       = ["0.0.0.0/0"]
 }

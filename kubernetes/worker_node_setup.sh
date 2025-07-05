@@ -87,6 +87,8 @@ echo "---------------     Phase 4 - Join worker node to kubeadm cluster     ----
 echo "============================================================================================"
 
 sudo ./worker_join.sh
+chmod +x makeVolumes.sh
+./makeVolumes.sh
 
 
 echo "############################ COMPLETED WORKER NODE SETUP ################################"

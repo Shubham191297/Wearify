@@ -3,7 +3,7 @@ kind: PersistentVolume
 metadata:
   name: mongo-wearify-pv
   labels:
-    type: local
+    type: nosql
 spec:
   storageClassName: manual
   capacity:
@@ -25,6 +25,9 @@ spec:
   resources:
     requests:
       storage: 5Gi
+  selector:
+    matchLabels:
+      type: nosql
 
 ---
 apiVersion: apps/v1

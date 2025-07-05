@@ -109,7 +109,10 @@ kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/
 sudo kubeadm token create --print-join-command > worker_join.sh
 chmod +x worker_join.sh
 
+chmod +x k8s-manifests/deployments/deployServices.sh
+mv k8s-manifests/deployments/deployServices.sh ./
+
 while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys worker_join.sh ubuntu@"$worker_ip":/home/ubuntu; done < worker_private_ips.txt
-while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys worker_join.sh ubuntu@"$worker_ip":/home/ubuntu; done < ./k8s-manifests/deployments/makeVolumes.sh
+while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys ./k8s-manifests/deployments/makeVolumes.sh ubuntu@"$worker_ip":/home/ubuntu; done < worker_private_ips.txt
 
 echo "################################# COMPLETED MASTER NODE SETUP ###################################"

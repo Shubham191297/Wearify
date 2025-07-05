@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wearify-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wearify-frontend
+  template:
+    metadata:
+      labels:
+        app: wearify-frontend
+    spec:
+      containers:
+        - name: react-nginx
+          imagePullPolicy: Always
+          image: shubh1917/wearify-frontend
+          ports:
+            - containerPort: 80

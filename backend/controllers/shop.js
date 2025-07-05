@@ -4,7 +4,7 @@ const ShoppingBag = require("../models/bag.js");
 const Order = require("../models/order.js");
 const Product = require("../models/product.js");
 const pdfGenerator = require("../data/pdfGenerator.js");
-const { frontendURL } = require("../utils/serverURL.js");
+const { localFrontend } = require("../utils/serverURL.js");
 const stripe = require("stripe")(
   "sk_test_51MM08RSARoTdkEyg0BxRBlmAb8jsdpzebSepcdV7f6IeMpcdSMZ2t2HFZKLDspp0t4bGbN5aodGzpE9r7Y0A6pmu006ZMOpoQR"
 );
@@ -220,6 +220,10 @@ exports.mergeGuestShoppingBagData = (req, res) => {
 exports.postCheckout = (req, res) => {
   const shoppingBagId = req.user.shoppingBagId;
 
+  const remoteOrigin = localFrontend
+    ? "http://localhost:3000"
+    : req.headers.origin;
+
   let products;
   let totalPrice;
 
@@ -269,8 +273,8 @@ exports.postCheckout = (req, res) => {
                 };
               }),
               mode: "payment",
-              success_url: `${frontendURL}/checkout-success`,
-              cancel_url: `${frontendURL}/shoppingBag`,
+              success_url: `${remoteOrigin}/checkout-success`,
+              cancel_url: `${remoteOrigin}/shoppingBag`,
               customer: customer.id,
             })
           );

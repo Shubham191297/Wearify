@@ -93,6 +93,10 @@ resource "null_resource" "send_worker_ips_and_setup_script_to_master" {
       host        = aws_instance.wearify_master_node.public_ip
     }
   }
+
+  triggers = {
+    always_run = timestamp()
+  }
 }
 
 
@@ -134,5 +138,9 @@ resource "null_resource" "copy_to_worker_nodes_via_master" {
       bastion_user        = "ubuntu"
       bastion_private_key = tls_private_key.wearify_key.private_key_pem
     }
+  }
+
+  triggers = {
+    always_run = timestamp()
   }
 }
