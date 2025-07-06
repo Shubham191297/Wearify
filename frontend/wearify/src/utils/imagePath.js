@@ -1,1 +1,2 @@
-export const imagePath = "http://localhost:5001/";
+export const imagePath =
+  process.env.REACT_APP_IMAGE_PATH || "http://localhost:5001/";

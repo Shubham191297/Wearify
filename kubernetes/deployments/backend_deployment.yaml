@@ -18,6 +18,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: backend-wearify-pvc
+  namespace: wearify
 spec:
   storageClassName: manual
   accessModes:
@@ -31,6 +32,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-wearify-deployment
+  namespace: wearify
   labels:
     app: backend-wearify
 spec:

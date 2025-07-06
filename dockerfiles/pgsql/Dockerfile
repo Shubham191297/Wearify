@@ -2,10 +2,6 @@ FROM postgres:latest
 
 EXPOSE 5432
 
-#ENV POSTGRES_DB=wearify
-#ENV POSTGRES_USER=sthapliyal
-#ENV POSTGRES_PASSWORD=1319
-
 RUN apt-get update && apt-get install -y bash
 RUN useradd -m -s /bin/bash wearify && echo "wearify:1234" | chpasswd
 
