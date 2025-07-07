@@ -14,6 +14,7 @@ const User = require("./models/user");
 const ShoppingBag = require("./models/bag");
 // const sessionData = require("./utils/session-db");
 const jwt = require("jsonwebtoken");
+const API_BASE_PATH = process.env.CLUSTER_API_ENDPOINT_ROUTE || "";
 
 const app = express();
 
@@ -68,7 +69,10 @@ app.use(
 
 app.use(express.json());
 // app.use(sessionData);
-app.use("/images", express.static(path.join(__dirname, "images")));
+app.use(
+  `${API_BASE_PATH + "/images"}`,
+  express.static(path.join(__dirname, "images"))
+);
 
 app.use(cookieParser());
 
@@ -112,9 +116,9 @@ app.use((req, res, next) => {
   }
 });
 
-app.use("/", shopRoutes);
-app.use("/admin", adminRoutes);
-app.use("/auth", authRoutes);
+app.use(`${API_BASE_PATH + "/"}`, shopRoutes);
+app.use(`${API_BASE_PATH + "/admin"}`, adminRoutes);
+app.use(`${API_BASE_PATH + "/auth"}`, authRoutes);
 
 psSequelize
   .sync()

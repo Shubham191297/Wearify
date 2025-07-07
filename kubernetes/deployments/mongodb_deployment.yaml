@@ -60,3 +60,18 @@ spec:
         - name: mongo-storage
           persistentVolumeClaim:
             claimName: mongo-wearify-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: wearify-mongodb
+  namespace: wearify
+spec:
+  selector:
+    app: mongodb-wearify
+  ports:
+    - protocol: TCP
+      port: 27017
+      targetPort: 27017
+  type: ClusterIP

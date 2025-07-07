@@ -2,6 +2,7 @@ const Product = require("../models/product.js");
 const ShoppingBag = require("../models/bag.js");
 const { validationResult } = require("express-validator");
 const fileHelper = require("../utils/file.js");
+const ITEMS_PER_PAGE = 4;
 
 exports.addProduct = (req, res) => {
   const { title, description, category, color, price } = req.body;
@@ -44,17 +45,27 @@ exports.addProduct = (req, res) => {
 };
 
 exports.getProducts = (req, res) => {
+  const page = req.query.page;
+
   Product.find()
-    .then((products) => {
-      if (products.length !== 0) {
-        const productsData = JSON.stringify(products);
-        res.status(200).send(productsData);
-      } else {
-        res.status(200).send({ message: "No products found!" });
-      }
-    })
+    .countDocuments()
+    .then((productList) =>
+      Product.find()
+        .skip((page - 1) * ITEMS_PER_PAGE)
+        .limit(ITEMS_PER_PAGE)
+        .then((products) => {
+          if (products.length !== 0) {
+            const lastPage = Math.ceil(productList / ITEMS_PER_PAGE);
+            res
+              .status(200)
+              .send({ productsData: products, lastPage: lastPage });
+          } else {
+            res.status(200).send({ message: "No products found!" });
+          }
+        })
+    )
     .catch((err) =>
-      res.status(500).send({ message: "Unable to fetch products" })
+      res.status(500).send({ message: "Unable to load products!!" })
     );
 };
 

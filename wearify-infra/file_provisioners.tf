@@ -68,19 +68,6 @@ resource "null_resource" "send_worker_ips_and_setup_script_to_master" {
     }
   }
 
-  # File provisioner for app service yaml files
-  provisioner "file" {
-    source      = "${path.module}/../kubernetes/services"
-    destination = "/home/ubuntu/k8s-manifests/services"
-
-    connection {
-      type        = "ssh"
-      user        = "ubuntu"
-      private_key = tls_private_key.wearify_key.private_key_pem
-      host        = aws_instance.wearify_master_node.public_ip
-    }
-  }
-
   provisioner "remote-exec" {
     inline = [
       "chmod +x /home/ubuntu/master_node_setup.sh",

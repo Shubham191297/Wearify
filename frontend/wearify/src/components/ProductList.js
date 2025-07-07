@@ -87,7 +87,7 @@ const ProductItem = ({ adminPage, products, pageNumber, lastPage }) => {
             </div>
           ))}
       </div>
-      <Pagination page={pageNumber} lastPage={lastPage} />
+      <Pagination page={pageNumber} lastPage={lastPage} isAdmin={adminPage} />
     </div>
   );
 };

@@ -3,17 +3,20 @@ FROM node:18 AS builder
 
 WORKDIR /app
 
-# Clone repo and move to frontend
+COPY package*.json ./
+
+RUN npm install
+
 COPY . .
 
 ENV REACT_APP_IMAGE_PATH="/api/"
 ENV REACT_APP_SERVER_URL="/api/"
 
 RUN echo "Server URL is $REACT_APP_SERVER_URL"
-# Build the app
 RUN npm run build
 
 
+# Step 2: Deploy the build files to nginx for serving
 FROM nginx:alpine
 
 COPY --from=builder /app/build /usr/share/nginx/html
