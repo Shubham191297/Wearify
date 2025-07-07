@@ -59,6 +59,20 @@ spec:
       labels:
         app: backend-wearify
     spec:
+      initContainers:
+        - name: init-copy-backend-folders
+          image: shubh1917/wearify-backend
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              echo "✅ Copying default images and data to volume...";
+              cp -r /home/wearify/app/images/* /mnt/images/ || true;
+              cp -r /home/wearify/app/data/* /mnt/data/ || true;
+          volumeMounts:
+            - name: backend-images
+              mountPath: /mnt/images
+            - name: backend-data
+              mountPath: /mnt/data
       containers:
         - name: backend-wearify
           image: shubh1917/wearify-backend

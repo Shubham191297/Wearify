@@ -17,6 +17,7 @@ const ProductForm = ({ product, editMode }) => {
   const [productDetails, setProductDetails] = useState(
     product ? product : productDefaultValue
   );
+
   const errors = useActionData();
 
   const inputChangeHandler = (e) => {
@@ -228,8 +229,6 @@ export async function action({ request, params }) {
     errors.inputName = product.inputName;
     return errors;
   }
-
-  console.log(product);
 
   return redirect("/admin/products");
 }
