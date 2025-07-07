@@ -8,12 +8,13 @@ const sendgridTransport = require("nodemailer-sendgrid-transport");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const secretKey = require("../utils/secretKey");
+const SendGrid_API_Key = require("../utils/sendgridSecretKey");
+const { localFrontend } = require("../utils/serverURL");
 
 const transporter = nodeMailer.createTransport(
   sendgridTransport({
     auth: {
-      api_key:
-        "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",
+      api_key: SendGrid_API_Key,
     },
   })
 );
@@ -128,7 +129,7 @@ exports.postSignup = (req, res) => {
             return newUser.save().then(() => {
               return transporter.sendMail({
                 to: email,
-                from: "sthapliyal1912@gmail.com",
+                from: "balonishradha@gmail.com",
                 subject: "Signup Successful!",
                 html: "<h1>Welcome to Wearify</h1>",
               });
@@ -169,11 +170,13 @@ exports.postResetPassword = (req, res) => {
           return transporter
             .sendMail({
               to: req.body.email,
-              from: "sthapliyal1912@gmail.com",
+              from: "balonishradha@gmail.com",
               subject: "Password Reset Request",
               html: `
             <p>You requested for a password reset</p>
-            <p>Please click this <a href="http://localhost:3000/auth/reset/${token}">link</a> to set a new password!</p>
+            <p>Please click this <a href="${
+              localFrontend || req.headers.origin
+            }/auth/reset/${token}">link</a> to set a new password!</p>
           `,
             })
             .then((result) => {

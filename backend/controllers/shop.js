@@ -220,9 +220,7 @@ exports.mergeGuestShoppingBagData = (req, res) => {
 exports.postCheckout = (req, res) => {
   const shoppingBagId = req.user.shoppingBagId;
 
-  const remoteOrigin = localFrontend
-    ? "http://localhost:3000"
-    : req.headers.origin;
+  const remoteOrigin = localFrontend ? localFrontend : req.headers.origin;
 
   let products;
   let totalPrice;
