@@ -4,5 +4,7 @@ sudo chown -R 999:999 /mnt/postgre
 
 sudo mkdir -p /mnt/mongodb
 
-sudo mkdir -p /data/backend
-sudo chown -R 1000:1000 /data/backend
+sudo mkdir -p /mnt/backend/images
+sudo mkdir -p /mnt/backend/data
+sudo chown -R 1001:1001 /mnt/backend
+sudo chmod -R 775 /mnt/backend

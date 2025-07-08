@@ -11,21 +11,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: "/data/backend"
-
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: backend-config
-  namespace: wearify
-data:
-  CLUSTER_API_ENDPOINT_ROUTE: /api
-  CLUSTER_API_SERVER_PORT: "5000"
-  CLUSTER_API_SERVER_HOST: "0.0.0.0"
-  REMOTE_FRONTEND: "true"
-  CLUSTER_MONGO_URL: wearify-mongodb
-  CLUSTER_POSTGRES_HOST: wearify-postgres
+    path: "/mnt/backend"
 
 ---
 apiVersion: v1
@@ -40,6 +26,20 @@ spec:
   resources:
     requests:
       storage: 5Gi
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+  namespace: wearify
+data:
+  CLUSTER_API_ENDPOINT_ROUTE: /api
+  CLUSTER_API_SERVER_PORT: "5000"
+  CLUSTER_API_SERVER_HOST: "0.0.0.0"
+  REMOTE_FRONTEND: "true"
+  CLUSTER_MONGO_URL: wearify-mongodb
+  CLUSTER_POSTGRES_HOST: wearify-postgres
 
 ---
 apiVersion: apps/v1
@@ -60,19 +60,21 @@ spec:
         app: backend-wearify
     spec:
       initContainers:
-        - name: init-copy-backend-folders
+        - name: backend-data-copy
           image: shubh1917/wearify-backend
           command: ["/bin/sh", "-c"]
           args:
             - |
-              echo "✅ Copying default images and data to volume...";
+              mkdir -p /mnt/images /mnt/data;
               cp -r /home/wearify/app/images/* /mnt/images/ || true;
               cp -r /home/wearify/app/data/* /mnt/data/ || true;
           volumeMounts:
-            - name: backend-images
+            - name: backend-storage
               mountPath: /mnt/images
-            - name: backend-data
+              subPath: images
+            - name: backend-storage
               mountPath: /mnt/data
+              subPath: data
       containers:
         - name: backend-wearify
           image: shubh1917/wearify-backend
@@ -86,13 +88,17 @@ spec:
                 name: postgres-config
             - secretRef:
                 name: postgres-secret
-      #     volumeMounts:
-      #       - mountPath: /home/wearify/Wearify/backend/images
-      #         name: backend-storage
-      # volumes:
-      #   - name: backend-storage
-      #     persistentVolumeClaim:
-      #       claimName: backend-wearify-pvc
+          volumeMounts:
+            - name: backend-storage
+              mountPath: /home/wearify/app/images
+              subPath: images
+            - name: backend-storage
+              mountPath: /home/wearify/app/data
+              subPath: data
+      volumes:
+        - name: backend-storage
+          persistentVolumeClaim:
+            claimName: backend-wearify-pvc
 
 ---
 apiVersion: v1
