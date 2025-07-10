@@ -30,6 +30,15 @@ resource "aws_security_group_rule" "ssh_master_access" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "prometheus_ui_access_inbound_master" {
+  security_group_id = aws_security_group.wearify_master_sg.id
+  type              = "ingress"
+  from_port         = 30900
+  to_port           = 30900
+  protocol          = "tcp"
+  cidr_blocks       = ["204.107.141.245/32"]
+}
+
 resource "aws_security_group_rule" "etcd_master_inbound_access" {
   security_group_id        = aws_security_group.wearify_master_sg.id
   type                     = "ingress"
@@ -435,4 +444,13 @@ resource "aws_security_group_rule" "flannel_worker_egress_self" {
   to_port           = 8472
   protocol          = "udp"
   cidr_blocks       = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "node_exporter_for_all" {
+  security_group_id        = aws_security_group.wearify_master_sg.id
+  type                     = "ingress"
+  from_port                = 9100
+  to_port                  = 9100
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.wearify_master_sg.id
 }

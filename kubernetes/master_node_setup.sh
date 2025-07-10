@@ -111,6 +111,7 @@ chmod +x worker_join.sh
 
 chmod +x k8s-manifests/deployments/deployServices.sh
 mv k8s-manifests/deployments/deployServices.sh ./
+mv k8s-manifests/monitoring ./monitoring
 
 while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys worker_join.sh ubuntu@"$worker_ip":/home/ubuntu; done < worker_private_ips.txt
 while IFS= read -r worker_ip; do scp -i ~/.ssh/authorized_keys ./k8s-manifests/deployments/makeVolumes.sh ubuntu@"$worker_ip":/home/ubuntu; done < worker_private_ips.txt
