@@ -24,8 +24,7 @@ pipeline {
 
         stage('Copy TF State') {
             steps {
-                sh 'cp /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/terraform.tfstate /var/jenkins_h
-ome/workspace/wearify-demolish/wearify-infra/terraform.tfstate'
+                sh 'cp /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/terraform.tfstate /var/jenkins_home/workspace/wearify-demolish/wearify-infra/terraform.tfstate'
             }
         }
         stage('Destroying the infrastructure') {
