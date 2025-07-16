@@ -11,16 +11,11 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Destroying the infrastructure') {
             steps {
-                sh 'echo "Hello Shubham, ready for your deployment. Let\'s go"'
-            }
-        }
-        stage('Deploy') {
-            steps {
-                dir('wearify-infra') {
+                dir('../wearify-infra') {
                     sh 'terraform init'
-                    sh 'terraform apply --auto-approve'
+                    sh 'terraform destroy --auto-approve'
                 }
             }
         }
