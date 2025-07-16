@@ -14,11 +14,9 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                sh '''
-                    pwd
-                    cd wearify-infra
-                    terraform apply --auto-approve
-                '''
+                sh 'cd wearify-infra'
+                sh 'terraform init'
+                sh 'terraform apply --auto-approve'
             }
         }
     }
