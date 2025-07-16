@@ -16,12 +16,22 @@ pipeline {
                 cleanWs()
             }
         }
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Copy TF State') {
+            steps {
+                sh 'cp /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/terraform.tfstate /var/jenkins_h
+ome/workspace/wearify-demolish/wearify-infra/terraform.tfstate'
+            }
+        }
         stage('Destroying the infrastructure') {
             steps {
                 dir('../wearify-infra') {
-                    sh 'pwd'
                     sh 'terraform init'
-                    sh 'pwd'
                     sh 'terraform destroy --auto-approve'
                 }
             }
