@@ -11,6 +11,11 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
         stage('Destroying the infrastructure') {
             steps {
                 dir('../wearify-infra') {
