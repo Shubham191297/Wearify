@@ -21,15 +21,26 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Verify TF State Copy') {
+    steps {
+        sh 'ls -l /var/jenkins_home/workspace/wearify-demolish/wearify-infra'
+    }
+}
 
         stage('Copy TF State') {
             steps {
                 sh 'cp /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/terraform.tfstate /var/jenkins_home/workspace/wearify-demolish/wearify-infra/terraform.tfstate'
             }
         }
+
+        stage('Verify TF State Copy 2') {
+    steps {
+        sh 'ls -l /var/jenkins_home/workspace/wearify-demolish/wearify-infra'
+    }
+}
         stage('Destroying the infrastructure') {
             steps {
-                dir('../wearify-infra') {
+                dir('wearify-infra') {
                     sh 'terraform init'
                     sh 'terraform destroy --auto-approve'
                 }
