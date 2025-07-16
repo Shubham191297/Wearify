@@ -14,7 +14,9 @@ pipeline {
         stage('Destroying the infrastructure') {
             steps {
                 dir('../wearify-infra') {
+                    sh 'pwd'
                     sh 'terraform init'
+                    sh 'pwd'
                     sh 'terraform destroy --auto-approve'
                 }
             }

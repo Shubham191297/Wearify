@@ -27,6 +27,6 @@ if [ "$userchoice" -eq '2' ] || [ "$userchoice" -eq '3' ]; then
 
 echo "##### Running jenkins container wearify app automation ########"
 
-docker run -d --name wearify_jenkins -v ./jenkins_home:/var/jenkins_home -p 8080:8080 wearify-jenkins
+docker run -d --name wearify_jenkins --restart unless-stopped -v ./jenkins_home:/var/jenkins_home -p 8080:8080 wearify-jenkins
 
 fi
