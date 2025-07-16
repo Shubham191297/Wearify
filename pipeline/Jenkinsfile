@@ -12,11 +12,18 @@ pipeline {
                 sh 'echo "Hello Shubham"'
             }
         }
-        stage('Deploy') {
+        // stage('Deploy') {
+        //     steps {
+        //         dir('wearify-infra') {
+        //             sh 'terraform init'
+        //             sh 'terraform apply --auto-approve'
+        //         }
+        //     }
+        // }
+        stage('Destroy') {
             steps {
                 dir('wearify-infra') {
-                    sh 'terraform init'
-                    sh 'terraform apply --auto-approve'
+                    sh 'terraform destroy --auto-approve'
                 }
             }
         }
