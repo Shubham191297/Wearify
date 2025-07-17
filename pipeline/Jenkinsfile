@@ -35,7 +35,7 @@ pipeline {
                         echo "Setting up Master node at IP: ${wearify_master_ip_addr}"
 
                         sh """
-                        ssh -o IdentitiesOnly=yes -i ${wearify_key_path} ubuntu@${wearify_master_ip_addr} './master_node_setup.sh'
+                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ./wearify_keys/wearify_keypair.pem ubuntu@54.84.85.87 ./master_node_setup.sh
                         """
                     }
             }
