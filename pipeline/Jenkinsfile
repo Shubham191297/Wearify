@@ -26,6 +26,7 @@ pipeline {
             }
         }
         stage('Setup k8s cluster') {
+            steps{
             dir('wearify-infra') {
                     script {
                         def wearify_master_ip_addr = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
@@ -37,6 +38,7 @@ pipeline {
                         ssh -o IdentitiesOnly=yes -i ${wearify_key_path} ubuntu@${wearify_master_ip_addr} './master_node_setup.sh'
                         """
                     }
+            }
             }
         }
     }
