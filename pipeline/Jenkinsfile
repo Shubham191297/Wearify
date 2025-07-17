@@ -11,17 +11,32 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Booting up the pipline') {
             steps {
                 sh 'echo "Hello Shubham, ready for your deployment. Let\'s go"'
             }
         }
-        stage('Deploy') {
+        stage('Deploy infra') {
             steps {
                 dir('wearify-infra') {
+                    echo 'Deploying your wearify app infrastructure...'
                     sh 'terraform init'
                     sh 'terraform apply --auto-approve'
                 }
+            }
+        }
+        stage('Setup k8s cluster') {
+            dir('wearify-infra') {
+                    script {
+                        def wearify_master_ip_addr = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
+                        def wearify_key_path = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
+
+                        echo "Setting up Master node at IP: ${wearify_master_ip_addr}"
+
+                        sh """
+                        ssh -o IdentitiesOnly=yes -i ${wearify_key_path} ubuntu@${wearify_master_ip_addr} './master_node_setup.sh'
+                        """
+                    }
             }
         }
     }
