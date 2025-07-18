@@ -34,23 +34,24 @@ pipeline {
 
                         echo "Setting up Wearify Master node at IP: ${WEARIFY_MASTER_IP_ADDR}"
 
-                        sh """
-                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./master_node_setup.sh
-                        """
+                        // sh """
+                        // ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./master_node_setup.sh
+                        // """
                         
                         echo "Setting up Wearify Worker nodes"
                         sh """
-                        worker_ips=()
-                        while IFS= read -r line; do
-                            worker_ips+=("\$line")
-                        done < worker_private_ips.txt
-                        i=1
-                        for worker_ip in "\${worker_ips[@]}"; do
-                            echo "Setting up Worker \$i at \$worker_ip"
-                            ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} \
-                                "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ~/.ssh/wearify_keypair.pem ubuntu@\${worker_ip} 'bash /home/ubuntu/worker_node_setup.sh \${i}'"
-                            i=\$((i+1))
-                        done
+                            worker_ips=()
+                            while IFS= read -r line; do
+                                worker_ips+=(\"\$line\")
+                            done < worker_private_ips.txt
+
+                            i=1
+                            for worker_ip in \"\${worker_ips[@]}\"; do
+                                echo "Setting up Worker \$i at \$worker_ip"
+                                ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} \\
+                                    "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ~/.ssh/wearify_keypair.pem ubuntu@\${worker_ip} 'bash /home/ubuntu/worker_node_setup.sh \${i}'"
+                                i=\$((i+1))
+                            done
                         """
 
                         sh """
