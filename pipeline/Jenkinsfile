@@ -39,6 +39,7 @@ pipeline {
                         """
                         
                         echo "Setting up Wearify Worker nodes"
+                        sh "cat ./worker_private_ips.txt"
                         sh """
                         i=1
                         while IFS= read -r worker_ip; do
