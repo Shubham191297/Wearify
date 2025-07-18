@@ -40,8 +40,9 @@ pipeline {
                         
                         echo "Setting up Wearify Worker nodes"
                         sh """
+                            #!/bin/bash
                             echo "yaha tak thik hai bhai"
-                            
+
                             worker_ips=()
                             echo "yaha tak thik hai"
 
