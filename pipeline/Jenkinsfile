@@ -40,10 +40,15 @@ pipeline {
                         
                         echo "Setting up Wearify Worker nodes"
                         sh """
+                            #!/bin/bash
                             worker_ips=()
+                            echo "yaha tak thik hai"
+
                             while IFS= read -r line; do
                                 worker_ips+=(\"\$line\")
                             done < worker_private_ips.txt
+
+                            echo "ye tuteha bhai"
 
                             i=1
                             for worker_ip in \"\${worker_ips[@]}\"; do
