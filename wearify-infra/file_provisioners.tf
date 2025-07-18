@@ -29,6 +29,18 @@ resource "null_resource" "send_setup_script_and_yaml_files_to_master" {
     }
   }
 
+  provisioner "file" {
+    source      = "${path.module}/wearify_keys/wearify_keypair.pem"
+    destination = "/home/ubuntu/.ssh/wearify_keypair.pem"
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = tls_private_key.wearify_key.private_key_pem
+      host        = aws_instance.wearify_master_node.public_ip
+    }
+  }
+
   # File provisioner for master node script
   provisioner "file" {
     source      = "${path.module}/../kubernetes/master_node_setup.sh"
@@ -45,6 +57,19 @@ resource "null_resource" "send_setup_script_and_yaml_files_to_master" {
   provisioner "remote-exec" {
     inline = [
       "mkdir -p /home/ubuntu/k8s-manifests",
+    ]
+
+    connection {
+      type        = "ssh"
+      user        = "ubuntu"
+      private_key = tls_private_key.wearify_key.private_key_pem
+      host        = aws_instance.wearify_master_node.public_ip
+    }
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod 400 /home/ubuntu/.ssh/wearify_keypair.pem"
     ]
 
     connection {

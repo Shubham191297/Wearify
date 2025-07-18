@@ -82,16 +82,6 @@ resource "aws_instance" "wearify_master_node" {
 
   depends_on = [aws_key_pair.wearify_public_key, aws_security_group.wearify_master_sg]
 
-  user_data = <<-EOF
-              #!/bin/bash
-              mkdir -p /home/ubuntu/.ssh
-              cat <<EOKEY > /home/ubuntu/.ssh/wearify-key.pem
-              ${replace(tls_private_key.wearify_key.private_key_pem, "\n", "\\n")}
-              EOKEY
-              chmod 400 /home/ubuntu/.ssh/wearify-key.pem
-              chown ubuntu:ubuntu /home/ubuntu/.ssh/wearify-key.pem
-            EOF
-
   tags = {
     Name = "Wearify master node"
   }
