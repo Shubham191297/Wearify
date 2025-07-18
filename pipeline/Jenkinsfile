@@ -44,7 +44,7 @@ pipeline {
                         while IFS= read -r worker_ip; do
                             echo "Setting up Worker \$i at \$worker_ip"
                             ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ./wearify_keys/wearify_keypair.pem ubuntu@${wearify_master_ip_addr} \\
-                                "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ~/.ssh/wearify_keypair.pem ubuntu@\\\$worker_ip \\"bash /home/ubuntu/worker_node_setup.sh \$i\\""
+                                "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ~/.ssh/wearify_keypair.pem ubuntu@\${worker_ip} \\"bash /home/ubuntu/worker_node_setup.sh \${i}\\""
                             i=\$((i+1))
                         done < worker_private_ips.txt
                         """
