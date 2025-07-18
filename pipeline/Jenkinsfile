@@ -31,11 +31,27 @@ pipeline {
                     script {
                         def wearify_master_ip_addr = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
                         def wearify_key_path = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
+                        def wearify_worker_nodes_ip_addr = sh(script: "terraform output -raw wearify_worker_nodes_ipv4_addr", returnStdout: true).trim()
 
-                        echo "Setting up Master node at IP: ${wearify_master_ip_addr}"
+                        echo "Setting up Wearify Master node at IP: ${wearify_master_ip_addr}"
 
                         sh """
-                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ./wearify_keys/wearify_keypair.pem ubuntu@54.84.85.87 ./master_node_setup.sh
+                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ./wearify_keys/wearify_keypair.pem ubuntu@${wearify_master_ip_addr} ./master_node_setup.sh
+                        """
+                        
+                        echo "Setting up Wearify Worker nodes"
+                        sh """
+                        i=1
+                        while IFS= read -r worker_ip; do
+                            echo "Setting up Worker \$i at \$worker_ip"
+                            ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ./wearify_keys/wearify_keypair.pem ubuntu@${wearify_master_ip_addr} \\
+                                "ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ~/.ssh/wearify_keypair.pem ubuntu@\\\$worker_ip 'bash /home/ubuntu/worker_node_setup.sh \\\$i'"
+                            i=\\\$((i+1))
+                        done < worker_private_ips.txt
+                        """
+
+                        sh """
+                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ./wearify_keys/wearify_keypair.pem ubuntu@${wearify_master_ip_addr} kubectl get nodes
                         """
                     }
             }

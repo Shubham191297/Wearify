@@ -1,0 +1,23 @@
+${replace(tls_private_key.wearify_key.private_key_pem, "\n", "\\n")}
+
+user_data = <<-EOF
+              #!/bin/bash
+              mkdir -p /home/ubuntu/.ssh
+              cat <<EOKEY > /home/ubuntu/.ssh/wearify-key.pem
+              ${tls_private_key.wearify_key.private_key_pem}
+              EOKEY
+              chmod 400 /home/ubuntu/.ssh/wearify-key.pem
+              chown ubuntu:ubuntu /home/ubuntu/.ssh/wearify-key.pem
+            EOF
+
+
+
+  user_data = <<EOF
+#!/bin/bash
+mkdir -p /home/ubuntu/.ssh
+cat <<EOKEY > /home/ubuntu/.ssh/wearify_key.pem
+${replace(tls_private_key.wearify_key.private_key_pem, "\\n", "\n")}
+EOKEY
+chmod 400 /home/ubuntu/.ssh/wearify_key.pem
+chown ubuntu:ubuntu /home/ubuntu/.ssh/wearify_key.pem
+EOF
