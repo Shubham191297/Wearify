@@ -53,7 +53,7 @@ pipeline {
         echo "Setting up Worker \$i at \$worker_ip"
 
         ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} \\
-        bash -c \\"ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ~/.ssh/wearify_keypair.pem ubuntu@\\\$worker_ip bash /home/ubuntu/worker_node_setup.sh \\\$i\\"
+        bash -c \\"ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i /home/ubuntu/.ssh/wearify_keypair.pem ubuntu@\${worker_ip} bash /home/ubuntu/worker_node_setup.sh \${i}\\"
 
         i=\$((i+1))
     done
@@ -77,16 +77,12 @@ pipeline {
 
                         // sh '''
                         //     #!/bin/bash
-                        //     echo "yaha tak thik hai bhai"
 
                         //     worker_ips=()
-                        //     echo "yaha tak thik hai"
 
                         //     while IFS= read -r line; do
                         //         worker_ips+=(\"\$line\")
                         //     done < worker_private_ips.txt
-
-                        //     echo "ye tuteha bhai"
 
                         //     i=1
                         //     for worker_ip in \"\${worker_ips[@]}\"; do
