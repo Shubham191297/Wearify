@@ -32,7 +32,7 @@ pipeline {
                         env.WEARIFY_MASTER_IP_ADDR = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
                         env.WEARIFY_KEY_PATH = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
                         
-                        def worker_ips_output = sh(script: "terraform output -json wearify_worker_node_ipv4_addrs", returnStdout: true).trim()
+                        def worker_ips_output = sh(script: "terraform output -json wearify_worker_nodes_ipv4_addr", returnStdout: true).trim()
                         def worker_ips = new groovy.json.JsonSlurper().parseText(worker_ips_output)
                         def worker_ip_list = worker_ips.collect { "\"$it\"" }.join(" ")
 
