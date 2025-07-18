@@ -31,7 +31,6 @@ pipeline {
                     script {
                         def wearify_master_ip_addr = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
                         def wearify_key_path = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
-                        def wearify_worker_nodes_ip_addr = sh(script: "terraform output -raw wearify_worker_nodes_ipv4_addr", returnStdout: true).trim()
 
                         echo "Setting up Wearify Master node at IP: ${wearify_master_ip_addr}"
 
