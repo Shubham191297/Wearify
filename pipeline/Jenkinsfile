@@ -65,8 +65,9 @@ pipeline {
             steps {
                 dir('wearify-infra') {
                     script {
-                        env.WEARIFY_WORKER_IP_ADDRS = sh(script: "terraform output -raw aws_instance.wearify_worker_node.public_ip", returnStdout: true).trim()
-                        echo "Wearify worker node IPs: ${WEARIFY_WORKER_IP_ADDRS}"
+                        def outputJson = sh(script: "terraform output -json wearify_workers_public_ips", returnStdout: true).trim()
+                        def ipList = new groovy.json.JsonSlurper().parseText(outputJson)
+                        def workerIpList = ipList.collect { "\"$it\"" }.join(" ")
 
                         sh """
                         ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./deployServices.sh

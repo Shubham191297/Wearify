@@ -37,6 +37,11 @@ output "wearify_worker_node_arn" {
   value       = [for instance in aws_instance.wearify_worker_node : instance.public_dns]
 }
 
+output "wearify_workers_public_ips" {
+  value     = [for i in aws_instance.wearify_worker_node : i.public_ip]
+  sensitive = true
+}
+
 output "wearify_keypair" {
   description = "Wearify key used for Nodes"
   sensitive   = true
