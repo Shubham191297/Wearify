@@ -69,6 +69,8 @@ pipeline {
                         def ipList = new groovy.json.JsonSlurper().parseText(outputJson)
                         def workerIpList = ipList.collect { "\"$it\"" }.join(" ")
 
+                        echo "Workers ${workerIpList}"
+
                         sh """
                         ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./deployServices.sh
                         """
