@@ -27,7 +27,7 @@ pipeline {
         }
         stage('Setup k8s cluster') {
             steps{
-            dir('wearify-infra') {
+                dir('wearify-infra') {
                     script {
                         env.WEARIFY_MASTER_IP_ADDR = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
                         env.WEARIFY_KEY_PATH = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
@@ -58,7 +58,25 @@ pipeline {
                         ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} kubectl get nodes
                         """
                     }
+                }
             }
+        }
+        stage('Deploy services') {
+            steps {
+                dir('wearify-infra') {
+                    script {
+                        env.WEARIFY_WORKER_IP_ADDRS = sh(script: "terraform output -raw aws_instance.wearify_worker_node.public_ip", returnStdout: true).trim()
+                        echo "Wearify worker node IPs: ${WEARIFY_WORKER_IP_ADDRS}"
+
+                        sh """
+                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./deployServices.sh
+                        """
+
+                        sh """
+                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} kubectl get pods -o wide
+                        """
+                    }
+                }
             }
         }
     }
