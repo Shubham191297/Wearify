@@ -14,9 +14,9 @@ echo "access keys to build infrastructure on your behalf and deploy the app for 
 read -p 'AWS_ACCESS_KEY_ID: ' aws_access_key_id
 read -s -p 'AWS_SECRET_ACCESS_KEY: ' aws_secret_access_key
 
-# echo "[default]" > ~/.aws/credentials2
-# echo "aws_access_key_id = ${aws_access_key_id}" >> ~/.aws/credentials2
-# echo "aws_secret_access_key = ${aws_secret_access_key}" >> ~/.aws/credentials2
+echo "[default]" > ~/.aws/credentials
+echo "aws_access_key_id = ${aws_access_key_id}" >> ~/.aws/credentials
+echo "aws_secret_access_key = ${aws_secret_access_key}" >> ~/.aws/credentials
 echo -e "\n\nSaved your aws credentials 🔐 locally for use...😉\n"
 
 echo "Please choose operation from below. What do you want to perform?\n"
