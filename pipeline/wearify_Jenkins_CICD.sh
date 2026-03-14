@@ -34,14 +34,14 @@ if [ "$operationType" -eq 1 ]; then
     tar -cvzf jenkins_home.tgz ./jenkins_home
 
     echo "\nUploading to s3 remote bucket...🌥️"
-    aws s3 cp ./jenkins_home.tgz s3://wearify-app-infra-state-bucket/jenkins_home.tgz
+    aws s3 cp ./jenkins_home.tgz s3://wearify-infra-state-bucket/jenkins_home.tgz
     rm -rf ./jenkins_home.tgz
     rm -rf ./jenkins_home
 
 elif [ "$operationType" -eq 2 ]; then
 
     echo "\nFetching snapshot of jenkins volume from s3 🪣"
-    aws s3 cp s3://wearify-app-infra-state-bucket/jenkins_home.tgz ./jenkins_home.tgz
+    aws s3 cp s3://wearify-infra-state-bucket/jenkins_home.tgz ./jenkins_home.tgz
 
     echo "Unpacking your volume file to be mount ready ✅"
     tar -xvzf ./jenkins_home.tgz

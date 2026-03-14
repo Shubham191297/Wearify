@@ -5,7 +5,7 @@ USER root
 RUN apt-get update && apt-get install python3-pip -y
 
 # Add Docker's official GPG key:
-RUN apt-get update && apt-get install ca-certificates curl -y && \
+RUN apt-get update && apt-get install ca-certificates curl gnupg -y && \
     install -m 0755 -d /etc/apt/keyrings && \
     curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc && \
     chmod a+r /etc/apt/keyrings/docker.asc
@@ -23,5 +23,8 @@ RUN usermod -aG docker jenkins
 RUN curl -fsSL https://apt.releases.hashicorp.com/gpg | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg && \
     echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com bookworm main" \
     > /etc/apt/sources.list.d/hashicorp.list
+
+# RUN wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+# RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 
 RUN apt-get update && apt-get install -y terraform
