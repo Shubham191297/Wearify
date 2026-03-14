@@ -3,6 +3,10 @@ sleep 5
 kubectl create namespace monitoring
 sleep 5
 kubectl apply -f ./monitoring/node_exporter_ds.yaml
+kubectl apply -f ./monitoring/prometheus-serviceaccount.yaml
+kubectl apply -f ./monitoring/prometheus-clusterrole.yaml
+kubectl apply -f ./monitoring/prometheus-clusterrolebinding.yaml
+kubectl apply -f ./monitoring/prometheus-configmap.yaml
 
 echo "####################### Deploying Prometheus server #############################"
 sleep 10

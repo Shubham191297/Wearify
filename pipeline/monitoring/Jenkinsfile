@@ -33,9 +33,8 @@ pipeline {
                     
                         sh 'chmod 700 wearify_keys'
                         sh 'chmod 400 wearify_keys/wearify_keypair.pem'
-                        sh '''
-                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./monitoring/deployMonitoring.sh
-                        '''                
+                        sh '''ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} chmod +x ./monitoring/deployMonitoring.sh'''             
+                        sh '''ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./monitoring/deployMonitoring.sh'''             
                     }
                 }
             }
