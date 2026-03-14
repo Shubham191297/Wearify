@@ -7,7 +7,7 @@ terraform {
   }
 
   backend "s3" {
-    bucket = "wearify-infra-state-bucket"
+    bucket = "wearify-infra-state-bucket-new"
     key    = "env/dev/terraform.tfstate"
     region = "us-east-1"
   }
