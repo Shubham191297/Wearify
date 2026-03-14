@@ -11,6 +11,11 @@ pipeline {
     }
 
     stages {
+        stage('Replace terraform directory') {
+            steps {
+                sh 'cp -R /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/* /var/jenkins_home/workspace/wearify-demolish/wearify-infra/'
+            }
+        }
         stage('Setting up the monitoring') {
             steps
             {
