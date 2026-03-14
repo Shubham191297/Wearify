@@ -1,0 +1,30 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_ACCESS_KEY_ID     = credentials('aws_access_key_id')
+        AWS_SECRET_ACCESS_KEY = credentials('aws_secret_access_key')
+    }
+
+    options {
+        ansiColor('xterm')
+    }
+
+    stages {
+        stage('Setting up the monitoring') {
+            dir("wearify-infra")
+            {
+            steps {
+                script {
+                    env.WEARIFY_MASTER_IP_ADDR = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
+                    env.WEARIFY_KEY_PATH = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
+                    
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./deployMonitoring.sh
+                    '''                
+                }
+            }
+            }
+        }    
+    }
+}
