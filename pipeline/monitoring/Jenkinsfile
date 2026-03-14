@@ -13,22 +13,28 @@ pipeline {
     stages {
         stage('Replace terraform directory') {
             steps {
-                sh 'cp -R /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/* /var/jenkins_home/workspace/wearify-demolish/wearify-infra/'
+                dir('wearify-infra')
+                {
+                    script {
+                        sh 'cp -R /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/* /var/jenkins_home/workspace/wearify-demolish/wearify-infra/'
+                        sh 'terraform init'
+                    }
+                }
             }
         }
         stage('Setting up the monitoring') {
             steps
             {
-            dir("wearify-infra") {
-                script {
-                    env.WEARIFY_MASTER_IP_ADDR = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
-                    env.WEARIFY_KEY_PATH = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
+                dir("wearify-infra") {
+                    script {
+                        env.WEARIFY_MASTER_IP_ADDR = sh(script: "terraform output -raw wearify_master_node_ipv4_addr", returnStdout: true).trim()
+                        env.WEARIFY_KEY_PATH = sh(script: "terraform output -raw wearify_key_location", returnStdout: true).trim()
                     
-                    sh '''
-                    ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./deployMonitoring.sh
-                    '''                
+                        sh '''
+                        ssh -o StrictHostKeyChecking=no -o IdentitiesOnly=yes -i ${WEARIFY_KEY_PATH} ubuntu@${WEARIFY_MASTER_IP_ADDR} ./deployMonitoring.sh
+                        '''                
+                    }
                 }
-            }
             }
         }    
     }
