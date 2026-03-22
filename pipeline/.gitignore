@@ -1,1 +1,5 @@
 jenkins_data/
+ec2/jenkins_home/*
+ec2/jenkins_home.tgz
+ec2/terraform/.terraform*
+ec2/terraform/keys/*

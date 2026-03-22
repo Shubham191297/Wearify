@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Copy TF State') {
             steps {
-                sh 'cp /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/terraform.tfstate /var/jenkins_home/workspace/wearify-demolish/wearify-infra/terraform.tfstate'
+                sh 'cp /var/lib/jenkins/workspace/wearify-pipeline/wearify-infra/terraform.tfstate /var/lib/jenkins/workspace/wearify-demolish/wearify-infra/terraform.tfstate'
             }
         }
         stage('Destroying the infrastructure') {
@@ -21,7 +21,7 @@ pipeline {
                 dir('wearify-infra') {
                     sh 'terraform init'
                     sh 'terraform destroy --auto-approve'
-                    sh 'rm -rf /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/wearify_keys/*'
+                    sh 'rm -rf /var/lib/jenkins/workspace/wearify-pipeline/wearify-infra/wearify_keys/*'
                 }
             }
         }
