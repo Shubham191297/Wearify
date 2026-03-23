@@ -16,8 +16,8 @@ pipeline {
                 dir('wearify-infra')
                 {
                     script {
-                        sh 'chmod -R 777 /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/wearify_keys/wearify_keypair.pem'
-                        sh 'cp -R /var/jenkins_home/workspace/wearify-pipeline/wearify-infra/* /var/jenkins_home/workspace/wearify-monitoring/wearify-infra/'
+                        sh 'chmod -R 777 /var/lib/jenkins/workspace/wearify-pipeline/wearify-infra/wearify_keys/wearify_keypair.pem'
+                        sh 'cp -R /var/lib/jenkins/workspace/wearify-pipeline/wearify-infra/* /var/lib/jenkins/workspace/wearify-monitoring/wearify-infra/'
                         sh 'terraform init'
                     }
                 }
