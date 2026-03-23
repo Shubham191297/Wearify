@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "prometheus_ui_access_inbound_master" {
   from_port         = 30900
   to_port           = 30900
   protocol          = "tcp"
-  cidr_blocks       = ["204.107.141.245/32"]
+  cidr_blocks       = ["0.0.0.0/0"]
 }
 
 resource "aws_security_group_rule" "etcd_master_inbound_access" {
