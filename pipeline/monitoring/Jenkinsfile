@@ -1,4 +1,5 @@
 def repChanges = ''
+def isFirstBuild = false
 
 pipeline {
     agent any
@@ -16,7 +17,7 @@ pipeline {
         stage('Scanning the changes'){
             steps{
                 script {
-                    failedStage = 'Detection Stage'
+                    isFirstBuild = currentBuild.previousBuild == null
                     repChanges = sh(
                         script: "git diff --name-only HEAD~1 HEAD || echo 'FIRST_RUN'",
                         returnStdout: true
@@ -29,6 +30,11 @@ pipeline {
             }
         }
         stage('Replace terraform directory') {
+            when {
+                expression {
+                    return isFirstBuild
+                }
+            }
             steps {
                 dir('wearify-infra')
                 {
@@ -43,7 +49,7 @@ pipeline {
         stage('Setting up the monitoring') {
             when {
                 expression {
-                    repChanges.contains("kubernetes/monitoring") || repChanges.contains("FIRST_RUN")
+                    isFirstBuild || repChanges.contains("kubernetes/monitoring")
                 }
             }
             steps
