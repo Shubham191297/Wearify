@@ -1,3 +1,5 @@
+def repChanges = ''
+
 pipeline {
     agent any
 
@@ -11,6 +13,21 @@ pipeline {
     }
 
     stages {
+        stage('Scanning the changes'){
+            steps{
+                script {
+                    failedStage = 'Detection Stage'
+                    repChanges = sh(
+                        script: "git diff --name-only HEAD~1 HEAD || echo 'FIRST_RUN'",
+                        returnStdout: true
+                    ).trim()
+                }
+                echo "Updated files are ${repChanges}"
+                dir('kubernetes/deployments') {
+                    echo 'Scanned the changes from directory...'
+                }
+            }
+        }
         stage('Replace terraform directory') {
             steps {
                 dir('wearify-infra')
@@ -24,6 +41,11 @@ pipeline {
             }
         }
         stage('Setting up the monitoring') {
+            when {
+                expression {
+                    repChanges.contains("kubernetes/monitoring") || repChanges.contains("FIRST_RUN")
+                }
+            }
             steps
             {
                 dir("wearify-infra") {
