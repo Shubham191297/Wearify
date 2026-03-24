@@ -19,7 +19,7 @@ pipeline {
                 script {
                     isFirstBuild = currentBuild.previousBuild == null
                     repChanges = sh(
-                        script: "git diff --name-only HEAD~1 HEAD || true",
+                        script: "git diff --name-only HEAD~1 HEAD",
                         returnStdout: true
                     ).trim()
                 }

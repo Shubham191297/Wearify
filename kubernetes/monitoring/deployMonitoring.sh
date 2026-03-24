@@ -18,8 +18,8 @@ kubectl apply -f ./monitoring/prometheus_server.yaml
 
 
 echo "####################### Restarting Prometheus (Apply Config Changes) #############################"
-kubectl rollout restart deployment prometheus -n monitoring || true
-kubectl rollout status deployment prometheus -n monitoring
+kubectl rollout restart deployment prometheus-server -n monitoring || true
+kubectl rollout status deployment prometheus-server -n monitoring
 
 
 echo "####################### Verifying Monitoring #############################"
