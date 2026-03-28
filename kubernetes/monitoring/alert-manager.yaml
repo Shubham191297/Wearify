@@ -35,7 +35,7 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /etc/alertmanager/config.yml
-              subPath: config.yaml
+              subPath: config.yml
             - name: templates-volume
               mountPath: /etc/alertmanager-templates
             - name: alertmanager

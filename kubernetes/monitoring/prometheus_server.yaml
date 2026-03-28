@@ -27,10 +27,16 @@ spec:
             - name: prometheus-config-volume
               mountPath: /etc/prometheus/prometheus.yaml
               subPath: prometheus.yaml
+            - name: alerting-rules-volume
+              mountPath: /etc/prometheus/rules/alerting-rules.yaml
+              subPath: alerting-rules.yaml
       volumes:
         - name: prometheus-config-volume
           configMap:
             name: prometheus-config
+        - name: alerting-rules-volume
+          configMap:
+            name: alerting-rules-config
 
 ---
 apiVersion: v1

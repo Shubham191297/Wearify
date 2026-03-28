@@ -6,33 +6,36 @@ metadata:
 data:
   config.yml: |-
     global:
+      resolve_timeout: 5m
     templates:
     - '/etc/alertmanager/*.tmpl'
     route:
-      receiver: alert-emailer
+      receiver: slack_demo
       group_by: ['alertname', 'priority']
       group_wait: 10s
       repeat_interval: 30m
       routes:
         - receiver: slack_demo
-        # Send severity=slack alerts to slack.
           match:
-            severity: slack
+            severity: critical
           group_wait: 10s
           repeat_interval: 1m
 
     receivers:
     - name: alert-emailer
       email_configs:
-      - to: demo@devopscube.com
+      - to: sthapliyal1912@gmail.com
         send_resolved: false
-        from: from-email@email.com
-        smarthost: smtp.eample.com:25
-        require_tls: false
+        from: thapliyalshubham8@email.com
+        smarthost: smtp.gmail.com:587
+        auth_username: thapliyalshubham8@gmail.com
+        auth_password: 'kjmb zaqy ztga rqvs'
+        require_tls: true
     - name: slack_demo
       slack_configs:
-      - api_url: https://hooks.slack.com/services/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sz4Qk
-        channel: '#devopscube-demo'
+      - api_url: https://hooks.slack.com/services/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
+        channel: '#wearify-infrastructure'
+        send_resolved: true
 ---
 apiVersion: v1
 kind: ConfigMap
