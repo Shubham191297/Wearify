@@ -13,8 +13,7 @@ data:
                 - localhost:9093
 
     rule_files:
-      # - "rules/myrules.yaml"
-      # - "second_rules.yml"
+      - "./alerting-rules.yaml"
 
     scrape_configs:
       - job_name: "prometheus"

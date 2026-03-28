@@ -39,6 +39,15 @@ resource "aws_security_group_rule" "prometheus_ui_access_inbound_master" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+resource "aws_security_group_rule" "alertmanager_ui_access_inbound_master" {
+  security_group_id = aws_security_group.wearify_master_sg.id
+  type              = "ingress"
+  from_port         = 30903
+  to_port           = 30903
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+}
+
 resource "aws_security_group_rule" "etcd_master_inbound_access" {
   security_group_id        = aws_security_group.wearify_master_sg.id
   type                     = "ingress"

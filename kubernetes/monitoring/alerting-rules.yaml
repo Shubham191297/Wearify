@@ -1,0 +1,41 @@
+groups:
+  - name: alert-rules
+    rules:
+      - alert: NodeDown
+        expr: up == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} down"
+          description: "{{ $labels.instance }} node has been down for more than 5 minutes."
+      - alert: CpuUsageHigh
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 2m
+        labels:
+          severity: critical
+          app_type: system
+          category: cpu
+        annotations:
+          summary: "Node CPU usage is HIGH"
+          description: "CPU load for instance {{ $labels.instance }} has reached {{ $value }}%"
+      - alert: MemoryUsageHigh
+        expr: (100 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)*100) >= 75
+        for: 2m
+        labels:
+          severity: critical
+          app_type: system
+          category: memory
+        annotations:
+          summary: "Node memory usage is very HIGH"
+          description: "Node memory for instance {{ $labels.instance }} has reached {{ $value }}%"
+      - alert: DiskSpaceRunningOut
+        expr: (sum by (instance) (node_filesystem_avail_bytes) / sum by (instance) (node_filesystem_size_bytes)) * 100 < 30
+        for: 2m
+        labels:
+          severity: warning
+          app_type: system
+          category: disk
+        annotations:
+          summary: "Node free disk space is running out"
+          description: "Node disk is going to full (< 30% left)\n  Current free disk space is {{ $value }}"

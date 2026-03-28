@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alertmanager
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alertmanager
+  template:
+    metadata:
+      name: alertmanager
+      labels:
+        app: alertmanager
+    spec:
+      nodeSelector:
+        kubernetes.io/hostname: wearify-master
+      containers:
+        - name: alertmanager
+          image: prom/alertmanager:latest
+          args:
+            - "--config.file=/etc/alertmanager/config.yml"
+            - "--storage.path=/alertmanager"
+          ports:
+            - name: alertmanager
+              containerPort: 9093
+          resources:
+            requests:
+              cpu: 500m
+              memory: 500M
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/alertmanager/config.yml
+              subPath: config.yaml
+            - name: templates-volume
+              mountPath: /etc/alertmanager-templates
+            - name: alertmanager
+              mountPath: /alertmanager
+      volumes:
+        - name: config-volume
+          configMap:
+            name: alertmanager-config
+        - name: templates-volume
+          configMap:
+            name: alertmanager-templates
+        - name: alertmanager
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alert-manager-service
+  namespace: monitoring
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9093"
+spec:
+  type: NodePort
+  selector:
+    app: alertmanager
+  ports:
+    - port: 9093
+      targetPort: 9093
+      nodePort: 30903
