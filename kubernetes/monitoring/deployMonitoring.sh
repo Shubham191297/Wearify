@@ -10,7 +10,7 @@ sleep 10
 kubectl apply -f ./monitoring/prometheus-serviceaccount.yaml
 kubectl apply -f ./monitoring/prometheus-clusterrole.yaml
 kubectl apply -f ./monitoring/prometheus-clusterrolebinding.yaml
-kubectl apply -f ./monitoring/alerting-rules.yaml
+kubectl apply -f ./monitoring/alerting-rules-config.yaml
 kubectl apply -f ./monitoring/prometheus-configmap.yaml
 
 

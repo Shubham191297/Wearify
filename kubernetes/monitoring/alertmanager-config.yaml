@@ -33,7 +33,7 @@ data:
         require_tls: true
     - name: slack_demo
       slack_configs:
-      - api_url: https://hooks.slack.com/services/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
+      - api_url: "<Hello>"
         channel: '#wearify-infrastructure'
         send_resolved: true
 ---

@@ -27,11 +27,11 @@ spec:
               containerPort: 9093
           resources:
             requests:
-              cpu: 500m
-              memory: 500M
+              cpu: 200m
+              memory: 200M
             limits:
-              cpu: "1"
-              memory: 1Gi
+              cpu: "500m"
+              memory: 500Mi
           volumeMounts:
             - name: config-volume
               mountPath: /etc/alertmanager/config.yml
